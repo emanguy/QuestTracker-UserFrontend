@@ -1,0 +1,10 @@
+$smallScreenLimit: 600px;
+
+@mixin on-device-type($displaySize) {
+  @if $displaySize == mobile {
+    @media only screen and (max-width: $smallScreenLimit) { @content; }
+  }
+  @else if $displaySize == desktop {
+    @media only screen and (min-width: $smallScreenLimit + 1) { @content; }
+  }
+}

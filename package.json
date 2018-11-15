@@ -5,9 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit 'tests/**/*.ts'"
   },
   "dependencies": {
+    "common-interfaces": "github:emanguy/QuestTracker-CommonInterfaces#1.2.1",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
@@ -15,15 +16,20 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.0",
+    "@types/chai-as-promised": "^7.1.0",
     "@types/mocha": "^5.2.4",
+    "@types/sinon": "^5.0.5",
     "@vue/cli-plugin-babel": "^3.0.4",
     "@vue/cli-plugin-typescript": "^3.0.4",
     "@vue/cli-plugin-unit-mocha": "^3.0.4",
     "@vue/cli-service": "^3.0.4",
     "@vue/test-utils": "^1.0.0-beta.20",
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
+    "sinon": "^7.1.1",
+    "ts-node": "^7.0.1",
     "typescript": "^3.0.0",
     "vue-template-compiler": "^2.5.17"
   }
