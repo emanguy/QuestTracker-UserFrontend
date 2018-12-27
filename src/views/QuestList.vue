@@ -1,19 +1,20 @@
-import {QuestType} from "common-interfaces/QuestInterfaces";
 <template>
     <transition name="list-zoom">
-        <div id="side-spacer">
+        <div class="side-spacer">
             <span id="title-span" class="center">
                 <h1 id="main-title" class="heading text-on-primary rounded-container">ACTIVE QUESTS</h1>
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
             <div id="main-quest-container" class="vertical-flexbox" v-if="questList.length > 0">
-                <quest-chip
-                        v-for="quest of questList"
-                        :key="quest.id"
-                        :quest="quest"
-                        :class="{invisibleQuest: !(quest.visible)}"
-                />
+                <router-link
+                    v-for="quest of questList"
+                    :key="quest.id"
+                    :class="{invisibleQuest: !(quest.visible), 'no-link-decor': true}"
+                    :to="{ name: 'questDetail', params: { questId: quest.id }}"
+                >
+                    <quest-chip :quest="quest"/>
+                </router-link>
             </div>
             <div id="no-quests" v-else class="rounded-container">No quests</div>
         </div>
@@ -21,7 +22,7 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component} from 'vue-property-decorator';
     import QuestChip from "../components/QuestChip.vue";
     import ErrorBox from "../components/ErrorBox.vue";
     import QuestListInheritor from "../ts/QuestListInheritor";
@@ -45,15 +46,7 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
         display: inline-block;
         background-color: $themePrimaryColorDark;
     }
-    #side-spacer {
-        padding-left: 25%;
-        padding-right: 25%;
 
-        @include on-device-type(mobile) {
-            padding-left: 0;
-            padding-right: 0;
-        }
-    }
     #main-quest-container {
         justify-content: center;
 
@@ -65,6 +58,7 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
     #no-quests {
         background: white;
     }
+
     .invisibleQuest {
         display: none;
     }

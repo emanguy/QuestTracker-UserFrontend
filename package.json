@@ -8,7 +8,10 @@
     "test:unit": "vue-cli-service test:unit 'tests/**/*.ts'"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "bcryptjs": "^2.4.3",
     "common-interfaces": "github:emanguy/QuestTracker-CommonInterfaces#1.2.1",
+    "nonce": "^1.0.4",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",

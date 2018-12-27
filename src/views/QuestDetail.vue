@@ -32,6 +32,7 @@
     import QuestListInheritor from "../ts/QuestListInheritor";
     import {Quest, QuestType} from "common-interfaces/QuestInterfaces";
     import ErrorBox from "../components/ErrorBox.vue";
+
     @Component({
         components: {ErrorBox}
     })
@@ -73,8 +74,8 @@
       margin-right: 10%;
 
       @include on-device-type(mobile) {
-          margin-left: 0;
-          margin-right: 0;
+          margin-left: 8px;
+          margin-right: 8px;
       }
   }
 

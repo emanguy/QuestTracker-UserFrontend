@@ -1,19 +1,17 @@
 <template>
-    <router-link :to="{ name: 'questDetail', params: { questId: quest.id }}">
-        <div id="container" :class="horizontalContainerClasses">
-            <p>{{formattedType}} quest</p>
-            <div id="horizontalContainer" class="horizontal-flexbox">
-                <h3 class="title">{{quest.name}} <span v-if="totalObjectives !== 0 && completedObjectives === totalObjectives">(COMPLETE!)</span></h3>
-                <span class="flex-fill"></span>
-                <p class="not-on-mobile">{{completedObjectives}}/{{totalObjectives}} Objectives Complete</p>
-            </div>
+    <div id="container" :class="horizontalContainerClasses">
+        <p>{{formattedType}} quest</p>
+        <div id="horizontalContainer" class="horizontal-flexbox">
+            <h3 class="title">{{quest.name}} <span v-if="totalObjectives !== 0 && completedObjectives === totalObjectives">(COMPLETE!)</span></h3>
+            <span class="flex-fill"></span>
+            <p class="not-on-mobile">{{completedObjectives}}/{{totalObjectives}} Objectives Complete</p>
         </div>
-    </router-link>
+    </div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue} from "vue-property-decorator";
-    import {Quest, QuestType, Objective} from "common-interfaces/QuestInterfaces";
+    import {Objective, Quest, QuestType} from "common-interfaces/QuestInterfaces";
 
     @Component
     export default class QuestChip extends Vue {
@@ -49,11 +47,6 @@
 
 <style scoped lang="scss">
     @import "../assets/CommonStyles";
-
-    a { // Makes the implicit "a" tag beneath the router-link not underline everything
-        text-decoration: none;
-        color: inherit;
-    }
 
     #container {
         transition: transform .2s;
