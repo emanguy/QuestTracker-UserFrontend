@@ -36,6 +36,11 @@ export class BackendOfflineError extends Error {
     }
 }
 
+export interface ApiCredentials {
+    username: string
+    authToken: string
+}
+
 function produceApiPath(path: string) : string {
     return `http://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
 }
@@ -130,7 +135,7 @@ export async function getFullQuestList() : Promise<Quest[]> {
  * @param username The username to log in with
  * @param password The password to log in with
  */
-export async function loginWithCredentials(username: string, password: string) : Promise<LoginToken> {
+export async function loginWithCredentials(username: string, password: string) : Promise<ApiCredentials> {
     // Retrieve server and client nonces
     const serverNoncePromise = backendTransaction<NonceSaltPair>(`auth/${username}/nonce`);
     const clientNonceGenerator = nonce();
@@ -152,7 +157,8 @@ export async function loginWithCredentials(username: string, password: string) :
     };
 
     // Perform login token transaction
-    return backendTransaction<LoginToken, AccessTokenRequest>(`auth/${username}/login`, "POST", undefined, loginRequest);
+    const token = await backendTransaction<LoginToken, AccessTokenRequest>(`auth/${username}/login`, "POST", undefined, loginRequest);
+    return {username, authToken: token.loginToken};
 }
 
 /**

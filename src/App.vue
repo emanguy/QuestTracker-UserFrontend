@@ -1,13 +1,18 @@
 <template>
   <div id="app">
     <header class="horizontal-flexbox">
-      <h3>Quest Tracker</h3>
+      <router-link class="no-link-decor" :to="{ name: 'questList' }">
+        <h3>Quest Tracker</h3>
+      </router-link>
       <div class="flex-fill"></div>
       <router-link :to="{ name: 'adminPage' }">
         <h3>DM Login</h3>
       </router-link>
     </header>
-    <router-view :questList="questList" :backendError="backendError"/>
+
+    <keep-alive>
+      <router-view :questList="questList" :backendError="backendError"/>
+    </keep-alive>
   </div>
 </template>
 

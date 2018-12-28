@@ -12,10 +12,16 @@
     export default class ErrorBox extends Vue{
         @Prop({default: null}) backendError!: Error|null;
         @Prop({default: true}) hideOnNoError!: Boolean;
+        @Prop({default: {}}) specialHttpStatusMessages!: {[code: number]: string};
 
         get renderError() : String {
             if (this.backendError instanceof BadHTTPCodeError) {
-                return `Backend server sent bad HTTP code: ${this.backendError.statusCode}. Please reload the page.`;
+                if (this.specialHttpStatusMessages[this.backendError.statusCode]) {
+                    return this.specialHttpStatusMessages[this.backendError.statusCode];
+                }
+                else {
+                    return `Backend server sent bad HTTP code: ${this.backendError.statusCode}. Please reload the page.`;
+                }
             }
             else if (this.backendError instanceof MalformedResponseError) {
                 return "Couldn't make heads or tails of the response from the server. Please reload the page.";
