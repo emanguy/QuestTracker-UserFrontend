@@ -5,8 +5,11 @@ import {BadHTTPCodeError, MalformedResponseError} from '../../src/ts/BackendConn
 import MainAppComponent from "../../src/App.vue";
 import {shallowMount} from "@vue/test-utils";
 import {timeout} from "./TestUtils";
+import Router from "vue-router";
+import Vue from "vue";
 
 chai.use(promiseExtension);
+Vue.use(Router);
 
 describe("Primary app component", () => {
     it("retries backend request 5 times before giving up", async () => {

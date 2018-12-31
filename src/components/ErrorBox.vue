@@ -12,7 +12,7 @@
     export default class ErrorBox extends Vue{
         @Prop({default: null}) backendError!: Error|null;
         @Prop({default: true}) hideOnNoError!: Boolean;
-        @Prop({default: {}}) specialHttpStatusMessages!: {[code: number]: string};
+        @Prop({default: () => {}}) specialHttpStatusMessages!: {[code: number]: string};
 
         get renderError() : String {
             if (this.backendError instanceof BadHTTPCodeError) {

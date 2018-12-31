@@ -9,7 +9,7 @@
     import {Component} from "vue-property-decorator";
     import QuestListInheritor from "../ts/QuestListInheritor";
     import AdminLoginDialog from "../components/AdminLoginDialog.vue";
-    import AdminQuestList from "../components/AdminQuestList.vue";
+    import AdminQuestList from "../components/AdminQuestEditor.vue";
     import ErrorBox from "../components/ErrorBox.vue";
     import {ApiCredentials} from "../ts/BackendConnector";
 
