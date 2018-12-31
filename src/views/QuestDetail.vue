@@ -29,14 +29,15 @@
 
 <script lang="ts">
     import {Component} from "vue-property-decorator";
-    import QuestListInheritor from "../ts/QuestListInheritor";
+    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
     import {Quest, QuestType} from "common-interfaces/QuestInterfaces";
     import ErrorBox from "../components/ErrorBox.vue";
+    import {mixins} from "vue-class-component";
 
     @Component({
         components: {ErrorBox}
     })
-    export default class QuestDetailPage extends QuestListInheritor {
+    export default class QuestDetailPage extends mixins(QuestListInheritorMixin) {
         private defaultQuest: Quest = {
             id: "undefined",
             visible: true,

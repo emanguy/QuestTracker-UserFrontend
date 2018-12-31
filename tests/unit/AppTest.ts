@@ -12,12 +12,22 @@ chai.use(promiseExtension);
 Vue.use(Router);
 
 describe("Primary app component", () => {
+    const fakeBackendListener = {
+        createEventListeners: sinon.stub([]),
+        updateEventListeners: sinon.stub([]),
+        deleteEventListeners: sinon.stub([]),
+        errorEventListeners: sinon.stub([]),
+        startListening: sinon.stub(),
+        stopListening: sinon.stub()
+    };
+
     it("retries backend request 5 times before giving up", async () => {
         const getQuestListStub = sinon.stub().rejects(new BadHTTPCodeError("message", 400));
         const mount = shallowMount(MainAppComponent, {
             data: function() { // Overwriting the method to retrieve quests
                 return {
-                    retrieveQuestsMethod: getQuestListStub
+                    retrieveQuestsMethod: getQuestListStub,
+                    backendUpdateListener: fakeBackendListener
                 }
             }
         });
@@ -36,7 +46,8 @@ describe("Primary app component", () => {
         const mount = shallowMount(MainAppComponent, {
             data: function () { // Overwriting the method to retrieve quests
                 return {
-                    retrieveQuestsMethod: failingGetQuestsStub
+                    retrieveQuestsMethod: failingGetQuestsStub,
+                    backendUpdateListener: fakeBackendListener
                 }
             }
         });

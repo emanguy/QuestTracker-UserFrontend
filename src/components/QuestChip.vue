@@ -47,15 +47,12 @@
 
 <style scoped lang="scss">
     @import "../assets/CommonStyles";
+    @import "../assets/MouseHoverMixin";
 
     #container {
-        transition: transform .2s;
-        align-items: start;
+        @include hover-animation();
 
-        &:hover {
-            transform: scale(1.05);
-            cursor: pointer;
-        }
+        align-items: start;
 
         &:not(.accent-background) {
             background-color: white;

@@ -11,7 +11,7 @@
     </header>
 
     <keep-alive>
-      <router-view :questList="questList" :backendError="backendError"/>
+      <router-view :quest-list="questList" :backend-error="backendError"/>
     </keep-alive>
   </div>
 </template>

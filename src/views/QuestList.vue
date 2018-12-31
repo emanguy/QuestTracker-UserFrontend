@@ -2,7 +2,7 @@
     <transition name="list-zoom">
         <div class="side-spacer">
             <span id="title-span" class="center">
-                <h1 id="main-title" class="heading text-on-primary rounded-container">ACTIVE QUESTS</h1>
+                <h1 id="main-title" class="heading dark-primary-background rounded-container">ACTIVE QUESTS</h1>
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
@@ -25,12 +25,13 @@
     import {Component} from 'vue-property-decorator';
     import QuestChip from "../components/QuestChip.vue";
     import ErrorBox from "../components/ErrorBox.vue";
-    import QuestListInheritor from "../ts/QuestListInheritor";
+    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import {mixins} from "vue-class-component";
 
     @Component({
         components: {QuestChip, ErrorBox}
     })
-    export default class QuestList extends QuestListInheritor {
+    export default class QuestList extends mixins(QuestListInheritorMixin) {
     }
 </script>
 

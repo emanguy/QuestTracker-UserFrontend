@@ -57,7 +57,13 @@ header {
   color: $onAccentColor;
 }
 
-.text-on-primary {
+.primary-color-background {
+  background-color: $themePrimaryColor;
+  color: $onPrimaryColor;
+}
+
+.dark-primary-background {
+  background-color: $themePrimaryColorDark;
   color: $onPrimaryColor;
 }
 
