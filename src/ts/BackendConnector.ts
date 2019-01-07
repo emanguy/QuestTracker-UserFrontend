@@ -1,6 +1,15 @@
 import nonce from "nonce";
 import {hash} from "bcryptjs";
-import {GenericAdd, GenericDeletion, GenericUpdate, Quest} from "common-interfaces/QuestInterfaces";
+import {
+    GenericAdd,
+    GenericDeletion,
+    GenericUpdate,
+    Quest,
+    RestBodyObjective,
+    RestBodyObjectiveUpdate,
+    RestBodyQuest,
+    RestBodyQuestUpdate
+} from "common-interfaces/QuestInterfaces";
 import {ErrorDescription} from "common-interfaces/RestResponses";
 import {MessageType} from "common-interfaces/NotificationInterfaces";
 import {AccessTokenRequest, LoginToken, NonceSaltPair} from 'common-interfaces';
@@ -41,6 +50,13 @@ export interface ApiCredentials {
     authToken: string
 }
 
+enum HttpMethod {
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    DELETE = "DELETE"
+}
+
 function produceApiPath(path: string) : string {
     return `http://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
 }
@@ -49,6 +65,14 @@ function produceListenerPath(path: string) : string {
     return `http://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
 }
 
+function applyAuthCredentials(credentials: ApiCredentials) : Record<string, string> {
+    return {
+        'x-username': credentials.username,
+        'x-auth-token': credentials.authToken
+    }
+}
+
+// I really should have used an actual HTTP library for this, but it works for what I'm doing. Whatever.
 /**
  *
  * @throws BackendOfflineError if the backend api could not be reached
@@ -56,7 +80,7 @@ function produceListenerPath(path: string) : string {
  * @throws MalformedResponseError if an HTTP response is malformed
  * @throws MalformedBodyError if the provided body is not serializable
  */
-async function backendTransaction<T, P = null>(path: string, method: string = "GET", additionalHeaders: HeadersInit = {}, payload?: P) : Promise<T> {
+async function backendTransaction<T = undefined, P = null>(path: string, method: HttpMethod = HttpMethod.GET, additionalHeaders: HeadersInit = {}, payload?: P) : Promise<T> {
     const backendUrl = produceApiPath(path);
     let payloadString: string|undefined;
 
@@ -157,8 +181,36 @@ export async function loginWithCredentials(username: string, password: string) :
     };
 
     // Perform login token transaction
-    const token = await backendTransaction<LoginToken, AccessTokenRequest>(`auth/${username}/login`, "POST", undefined, loginRequest);
+    const token = await backendTransaction<LoginToken, AccessTokenRequest>(`auth/${username}/login`, HttpMethod.POST, undefined, loginRequest);
     return {username, authToken: token.loginToken};
+}
+
+export async function deauthCredentials(credentials: ApiCredentials) : Promise<undefined> {
+    return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE);
+}
+
+export async function createQuest(credentials: ApiCredentials, newQuest: RestBodyQuest) : Promise<undefined> {
+    return backendTransaction<undefined, RestBodyQuest>("quests", HttpMethod.POST, applyAuthCredentials(credentials), newQuest);
+}
+
+export async function addObjectiveToQuest(credentials: ApiCredentials, questId: string, newObjective: RestBodyObjective) : Promise<undefined> {
+    return backendTransaction<undefined, RestBodyObjective>(`quests/${questId}/objectives`, HttpMethod.POST, applyAuthCredentials(credentials), newObjective);
+}
+
+export async function modifyQuest(credentials: ApiCredentials, questId: string, updates: RestBodyQuestUpdate) : Promise<undefined> {
+    return backendTransaction<undefined, RestBodyQuestUpdate>(`quests/${questId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates);
+}
+
+export async function modifyObjective(credentials: ApiCredentials, questId: string, objectiveId: string, updates: RestBodyObjectiveUpdate) : Promise<undefined> {
+    return backendTransaction<undefined, RestBodyObjectiveUpdate>(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates);
+}
+
+export async function deleteQuest(credentials: ApiCredentials, questId: string) : Promise<undefined> {
+    return backendTransaction(`quests/${questId}`, HttpMethod.DELETE, applyAuthCredentials(credentials));
+}
+
+export async function deleteObjective(credentials: ApiCredentials, questId: string, objectiveId: string) : Promise<undefined> {
+    return backendTransaction(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.DELETE, applyAuthCredentials(credentials));
 }
 
 /**

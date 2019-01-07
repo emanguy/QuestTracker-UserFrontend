@@ -6,6 +6,7 @@
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
+            <!-- TODO update this v-if to support the case where no quests are visible but they exist -->
             <div id="main-quest-container" class="vertical-flexbox" v-if="questList.length > 0">
                 <router-link
                     v-for="quest of questList"

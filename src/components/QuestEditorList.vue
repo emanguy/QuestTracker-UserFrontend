@@ -3,8 +3,8 @@
     <div>
         <div id="known-quests" v-for="quest of questList" :key="quest.id" class="horizontal-flexbox">
             <quest-chip :quest="quest" @click.native="editQuest(quest)" :class="{'q-chip': true, 'invisible-quest': !quest.visible}"></quest-chip>
-            <div class="circle accent-background vertical-flexbox material-icons" @click="deleteQuest(quest.id)">clear</div>
-            <div class="circle accent-background vertical-flexbox material-icons" @click="toggleQuestVisibility(quest.id)">
+            <div class="circle accent-background vertical-flexbox material-icons" @click="triggerDeleteQuest(quest.id)">clear</div>
+            <div class="circle accent-background vertical-flexbox material-icons" @click="toggleQuestVisibility(quest.id, quest.visible)">
                 {{visibilityIcon(quest.visible)}}
             </div>
         </div>
@@ -21,6 +21,7 @@
     import QuestChip from "./QuestChip.vue";
     import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
     import AuthTokenInheritorMixin from "../ts/AuthTokenInheritorMixin";
+    import {deleteQuest, modifyQuest} from "@/ts/BackendConnector";
 
     @Component({
         components: {QuestChip}
@@ -41,19 +42,33 @@
          *
          * @param id ID of the quest to delete
          */
-        deleteQuest(id: string) {
+        async triggerDeleteQuest(id: string) {
             console.log(`Delete quest ${id}`);
-            // TODO
+
+            try {
+                await deleteQuest(this.authToken, id);
+            }
+            catch (e: Error) {
+                this.$emit("backend-error", e);
+            }
         }
 
         /**
          * Toggle visibility of quest
          *
          * @param id ID of quest to toggle visibility on
+         * @param currentlyVisible True if the quest is currently visible
          */
-        toggleQuestVisibility(id: string) {
+        async toggleQuestVisibility(id: string, currentlyVisible: boolean) {
             console.log(`Toggle visibility for quest ${id}`);
-            // TODO
+            console.log(this.authToken);
+
+            try {
+                await modifyQuest(this.authToken, id, {visible: !currentlyVisible});
+            }
+            catch (e: Error) {
+                this.$emit("backend-error", e);
+            }
         }
 
         /**
@@ -63,7 +78,7 @@
          */
         editQuest(quest: Quest) {
             console.log(`Enter editor for quest ${quest.id}`);
-            // TODO
+            // TODO launch quest creation screen in edit mode
         }
 
         /**
@@ -71,7 +86,7 @@
          */
         newQuest() {
             console.log("Create new quest");
-            // TODO
+            // TODO launch quest creation screen in add mode
         }
     }
 </script>

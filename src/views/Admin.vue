@@ -3,10 +3,12 @@
         <error-box class="margin-under" :backendError="currentError" :specialHttpStatusMessages="loginErrorMessages"></error-box>
         <component
                 :is="contentType"
-                :api-creds="credentials"
-                :questList="questList"
+                :auth-token="credentials"
+                :quest-list="questList"
                 @login-success="onLoginSuccess"
-                @login-failure="onLoginFailure"
+                @login-failure="onAccessFailure"
+                @backend-error="onAccessFailure"
+                @logout-request="onLogout"
         ></component>
     </div>
 </template>
@@ -17,7 +19,7 @@
     import AdminLoginDialog from "../components/AdminLoginDialog.vue";
     import AdminQuestList from "../components/AdminQuestEditor.vue";
     import ErrorBox from "../components/ErrorBox.vue";
-    import {ApiCredentials} from "../ts/BackendConnector";
+    import {ApiCredentials, deauthCredentials} from "../ts/BackendConnector";
     import {mixins} from "vue-class-component";
 
     @Component({
@@ -42,18 +44,28 @@
             this.contentType = "AdminQuestList";
         }
 
-        onLoginFailure(error: Error) {
-            console.log("Login failure");
+        onAccessFailure(error: Error) {
+            console.log("Backend access failure");
             console.log(error);
             this.currentError = error;
             this.credentials = null;
             this.contentType = "AdminLoginDialog";
         }
 
-        onLogout() {
+        async onLogout() {
             console.log("Logging user out.");
+
+            try {
+                await deauthCredentials(this.credentials);
+            }
+            catch (err: Error) {
+                console.error("Deauth failed.");
+                console.error(err);
+            }
+
             this.contentType = "AdminLoginDialog";
             this.credentials = null;
+            alert("Successfully logged out.");
         }
     }
 </script>

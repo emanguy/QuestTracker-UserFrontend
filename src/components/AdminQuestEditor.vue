@@ -2,27 +2,37 @@
     <div>
         <div class="center">
             <h1 id="editTitle" class="primary-color-background rounded-container ">Edit Quests</h1>
+            <br>
+            <h2 id="logoutBtn" class="rounded-container" @click="logout">Log out</h2>
         </div>
         <hr>
-        <component :is="currentEditorView" :quest-list="questList"></component>
+        <!-- TODO add prop bindings for selected quest and edit mode -->
+        <component
+                :is="currentEditorView"
+                :quest-list="questList"
+                :auth-token="authToken"
+        ></component>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop} from "vue-property-decorator";
+    import {Component} from "vue-property-decorator";
     import QuestEditorList from "./QuestEditorList.vue";
-    import {ApiCredentials} from "../ts/BackendConnector";
     import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
     import {mixins} from "vue-class-component";
+    import AuthTokenInheritorMixin from "@/ts/AuthTokenInheritorMixin";
 
 
     @Component({
         components: {QuestEditorList}
     })
-    export default class AdminQuestEditor extends mixins(QuestListInheritorMixin) {
-        @Prop({default: null}) apiCreds!: ApiCredentials;
+    export default class AdminQuestEditor extends mixins(QuestListInheritorMixin, AuthTokenInheritorMixin) {
         currentEditorView: string = "QuestEditorList";
 
+        logout() {
+            this.currentEditorView = "QuestEditorList";
+            this.$emit("logout-request");
+        }
     }
 </script>
 
@@ -32,6 +42,13 @@
 
     #editTitle {
         display: inline-block;
+    }
+
+    #logoutBtn {
+        @include hover-animation();
+
+        display: inline-block;
+        background-color: white;
     }
 
 </style>
