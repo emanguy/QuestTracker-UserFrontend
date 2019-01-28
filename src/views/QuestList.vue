@@ -6,8 +6,7 @@
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
-            <!-- TODO update this v-if to support the case where no quests are visible but they exist -->
-            <div id="main-quest-container" class="vertical-flexbox" v-if="questList.length > 0">
+            <div id="main-quest-container" class="vertical-flexbox" v-if="!noQuestsVisible()">
                 <router-link
                     v-for="quest of questList"
                     :key="quest.id"
@@ -27,12 +26,18 @@
     import QuestChip from "../components/QuestChip.vue";
     import ErrorBox from "../components/ErrorBox.vue";
     import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import {Quest} from "common-interfaces";
     import {mixins} from "vue-class-component";
 
     @Component({
         components: {QuestChip, ErrorBox}
     })
     export default class QuestList extends mixins(QuestListInheritorMixin) {
+        noQuestsVisible() : boolean {
+            return this.questList.length === 0 || this.questList.reduce((prevValue: boolean, currentValue: Quest) => {
+                return prevValue && !currentValue.visible;
+            }, true);
+        }
     }
 </script>
 

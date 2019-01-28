@@ -10,7 +10,7 @@ import {
     RestBodyQuest,
     RestBodyQuestUpdate
 } from "common-interfaces/QuestInterfaces";
-import {ErrorDescription} from "common-interfaces/RestResponses";
+import {ErrorDescription, NewlyCreatedDescription} from "common-interfaces/RestResponses";
 import {MessageType} from "common-interfaces/NotificationInterfaces";
 import {AccessTokenRequest, LoginToken, NonceSaltPair} from 'common-interfaces';
 
@@ -80,7 +80,7 @@ function applyAuthCredentials(credentials: ApiCredentials) : Record<string, stri
  * @throws MalformedResponseError if an HTTP response is malformed
  * @throws MalformedBodyError if the provided body is not serializable
  */
-async function backendTransaction<T = undefined, P = null>(path: string, method: HttpMethod = HttpMethod.GET, additionalHeaders: HeadersInit = {}, payload?: P) : Promise<T> {
+async function backendTransaction<T = undefined, P = null>(path: string, method: HttpMethod = HttpMethod.GET, additionalHeaders: HeadersInit = {}, payload?: P, deserializeResponse: boolean = true) : Promise<T> {
     const backendUrl = produceApiPath(path);
     let payloadString: string|undefined;
 
@@ -137,7 +137,12 @@ async function backendTransaction<T = undefined, P = null>(path: string, method:
     }
 
     try {
-        return serverResponse.json();
+        if (deserializeResponse) {
+            return serverResponse.json();
+        }
+        else {
+            return <any> serverResponse.text();
+        }
     }
     catch (err) {
         throw new MalformedResponseError();
@@ -185,32 +190,32 @@ export async function loginWithCredentials(username: string, password: string) :
     return {username, authToken: token.loginToken};
 }
 
-export async function deauthCredentials(credentials: ApiCredentials) : Promise<undefined> {
+export async function deauthCredentials(credentials: ApiCredentials) : Promise<void> {
     return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE);
 }
 
-export async function createQuest(credentials: ApiCredentials, newQuest: RestBodyQuest) : Promise<undefined> {
-    return backendTransaction<undefined, RestBodyQuest>("quests", HttpMethod.POST, applyAuthCredentials(credentials), newQuest);
+export async function createQuest(credentials: ApiCredentials, newQuest: RestBodyQuest) : Promise<void> {
+    return backendTransaction<undefined, RestBodyQuest>("quests", HttpMethod.POST, applyAuthCredentials(credentials), newQuest, false);
 }
 
-export async function addObjectiveToQuest(credentials: ApiCredentials, questId: string, newObjective: RestBodyObjective) : Promise<undefined> {
-    return backendTransaction<undefined, RestBodyObjective>(`quests/${questId}/objectives`, HttpMethod.POST, applyAuthCredentials(credentials), newObjective);
+export async function addObjectiveToQuest(credentials: ApiCredentials, questId: string, newObjective: RestBodyObjective) : Promise<NewlyCreatedDescription> {
+    return backendTransaction<NewlyCreatedDescription, RestBodyObjective>(`quests/${questId}/objectives`, HttpMethod.POST, applyAuthCredentials(credentials), newObjective);
 }
 
-export async function modifyQuest(credentials: ApiCredentials, questId: string, updates: RestBodyQuestUpdate) : Promise<undefined> {
-    return backendTransaction<undefined, RestBodyQuestUpdate>(`quests/${questId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates);
+export async function modifyQuest(credentials: ApiCredentials, questId: string, updates: RestBodyQuestUpdate) : Promise<void> {
+    return backendTransaction<undefined, RestBodyQuestUpdate>(`quests/${questId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates, false);
 }
 
-export async function modifyObjective(credentials: ApiCredentials, questId: string, objectiveId: string, updates: RestBodyObjectiveUpdate) : Promise<undefined> {
-    return backendTransaction<undefined, RestBodyObjectiveUpdate>(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates);
+export async function modifyObjective(credentials: ApiCredentials, questId: string, objectiveId: string, updates: RestBodyObjectiveUpdate) : Promise<void> {
+    return backendTransaction<undefined, RestBodyObjectiveUpdate>(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.PUT, applyAuthCredentials(credentials), updates, false);
 }
 
-export async function deleteQuest(credentials: ApiCredentials, questId: string) : Promise<undefined> {
-    return backendTransaction(`quests/${questId}`, HttpMethod.DELETE, applyAuthCredentials(credentials));
+export async function deleteQuest(credentials: ApiCredentials, questId: string) : Promise<void> {
+    return backendTransaction(`quests/${questId}`, HttpMethod.DELETE, applyAuthCredentials(credentials), undefined, false);
 }
 
-export async function deleteObjective(credentials: ApiCredentials, questId: string, objectiveId: string) : Promise<undefined> {
-    return backendTransaction(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.DELETE, applyAuthCredentials(credentials));
+export async function deleteObjective(credentials: ApiCredentials, questId: string, objectiveId: string) : Promise<void> {
+    return backendTransaction(`quests/${questId}/objectives/${objectiveId}`, HttpMethod.DELETE, applyAuthCredentials(credentials), undefined, false);
 }
 
 /**

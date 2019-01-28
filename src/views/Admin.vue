@@ -55,12 +55,14 @@
         async onLogout() {
             console.log("Logging user out.");
 
-            try {
-                await deauthCredentials(this.credentials);
-            }
-            catch (err: Error) {
-                console.error("Deauth failed.");
-                console.error(err);
+            if (this.credentials != null) {
+                try {
+                    await deauthCredentials(this.credentials);
+                }
+                catch (err) {
+                    console.error("Deauth failed.");
+                    console.error(err);
+                }
             }
 
             this.contentType = "AdminLoginDialog";

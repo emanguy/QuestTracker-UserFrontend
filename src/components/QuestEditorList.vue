@@ -48,7 +48,7 @@
             try {
                 await deleteQuest(this.authToken, id);
             }
-            catch (e: Error) {
+            catch (e) {
                 this.$emit("backend-error", e);
             }
         }
@@ -66,7 +66,7 @@
             try {
                 await modifyQuest(this.authToken, id, {visible: !currentlyVisible});
             }
-            catch (e: Error) {
+            catch (e) {
                 this.$emit("backend-error", e);
             }
         }
@@ -78,7 +78,7 @@
          */
         editQuest(quest: Quest) {
             console.log(`Enter editor for quest ${quest.id}`);
-            // TODO launch quest creation screen in edit mode
+            this.$emit("edit-quest", quest);
         }
 
         /**
@@ -86,7 +86,7 @@
          */
         newQuest() {
             console.log("Create new quest");
-            // TODO launch quest creation screen in add mode
+            this.$emit("add-quest");
         }
     }
 </script>

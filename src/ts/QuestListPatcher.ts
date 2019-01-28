@@ -8,6 +8,7 @@ import {
     Quest,
     QuestUpdate
 } from "common-interfaces/QuestInterfaces";
+import UpdateTargetNotFoundError from "@/ts/UpdateTargetNotFoundError";
 
 interface QuestAndIndex {
     index: number
@@ -17,15 +18,6 @@ interface QuestAndIndex {
 interface ObjectiveAndIndex {
     index: number
     objective: Objective
-}
-
-export class UpdateTargetNotFoundError extends Error {
-    target?: string;
-
-    constructor(message: string, target?: string) {
-        super(message);
-        this.target = target;
-    }
 }
 
 function findQuestToModify(questId: string, questList: Quest[]) : QuestAndIndex|null {

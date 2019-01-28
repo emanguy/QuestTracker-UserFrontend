@@ -18,7 +18,7 @@
                     <!-- Container for quest description -->
                     <div class="padded">
                         <h2 class="section-heading">Quest Description</h2>
-                        {{selectedQuest.description}}
+                        <p v-for="line of questDescriptionLines">{{line}}<br></p>
                     </div>
                 </div>
             </div>
@@ -34,6 +34,7 @@
     import ErrorBox from "../components/ErrorBox.vue";
     import {mixins} from "vue-class-component";
 
+    // TODO add support for newlines in the description
     @Component({
         components: {ErrorBox}
     })
@@ -57,6 +58,10 @@
             });
 
             return questMatchingId;
+        }
+
+        get questDescriptionLines() {
+            return this.selectedQuest.description.split("\n");
         }
     }
 </script>
