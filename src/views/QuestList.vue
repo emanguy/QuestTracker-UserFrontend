@@ -33,6 +33,10 @@
         components: {QuestChip, ErrorBox}
     })
     export default class QuestList extends mixins(QuestListInheritorMixin) {
+
+        /**
+         * Returns true if there are no quests in the quest list or none are visible.
+         */
         noQuestsVisible() : boolean {
             return this.questList.length === 0 || this.questList.reduce((prevValue: boolean, currentValue: Quest) => {
                 return prevValue && !currentValue.visible;

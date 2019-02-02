@@ -34,7 +34,6 @@
     import ErrorBox from "../components/ErrorBox.vue";
     import {mixins} from "vue-class-component";
 
-    // TODO add support for newlines in the description
     @Component({
         components: {ErrorBox}
     })
@@ -60,6 +59,9 @@
             return questMatchingId;
         }
 
+        /**
+         * Splits the quest description by LF characters so the description actually appears in paragraphs as intended
+         */
         get questDescriptionLines() {
             return this.selectedQuest.description.split("\n");
         }

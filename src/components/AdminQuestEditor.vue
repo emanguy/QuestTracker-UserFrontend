@@ -9,7 +9,6 @@ import {EditorMode} from "../ts/EditorBehavior";
             <h2 id="logoutBtn" class="rounded-container" @click="logout">Log out</h2>
         </div>
         <hr>
-        <!-- TODO add prop bindings for selected quest and edit mode -->
         <component
                 :is="currentEditorView"
                 :quest-list="questList"

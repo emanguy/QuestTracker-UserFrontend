@@ -1,11 +1,3 @@
-import {QuestType} from "common-interfaces/QuestInterfaces";
-import {QuestType} from "common-interfaces/QuestInterfaces";
-import {QuestType} from "common-interfaces/QuestInterfaces";
-import {QuestType} from "common-interfaces/QuestInterfaces";
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
 <template>
     <div id="container" class="rounded-container">
         <h3>
@@ -135,12 +127,18 @@ import {EditorMode} from "../ts/EditorBehavior";
             return this.editMode === EditorMode.UPDATE;
         }
 
+        /**
+         * Fires an event to request going back to the list page without attempting to save anything
+         */
         backToListNoSave() {
             this.$emit("editor-exit");
         }
 
+        /**
+         * Attempts to save changes to the backend then fires an event to request a return to the list page
+         */
         async backToListAndSave() {
-            const formInputs = this.formInputs;[]
+            const formInputs = this.formInputs;
             const behaviorInputPromises: Promise<any>[] = [];
 
             behaviorInputPromises.push(this.behavior.setName(formInputs.nameInput.value));
@@ -160,6 +158,9 @@ import {EditorMode} from "../ts/EditorBehavior";
             this.$emit("editor-exit");
         }
 
+        /**
+         * Invoked when the "update" button next to the name field is clicked, persisting changes to the backend
+         */
         async updateName() {
             const input = this.formInputs.nameInput;
 
@@ -168,10 +169,16 @@ import {EditorMode} from "../ts/EditorBehavior";
             }
         }
 
+        /**
+         * Updates visibility of quest when the checkbox is clicked
+         */
         async updateVisible() {
             return this.behavior.setVisible(this.formInputs.visibilityCheck.checked);
         }
 
+        /**
+         * Updates the quest type when different options are selected on the dropdown
+         */
         async updateType() {
             switch (this.formInputs.typeSelect.selectedIndex) {
                 case 0: // Selected "main"
@@ -179,12 +186,15 @@ import {EditorMode} from "../ts/EditorBehavior";
                 case 1:
                     return this.behavior.setQuestType(QuestType.SIDE);
                 default:
-                    console.log(new Error("Unsupported quest type selected"));
+                    console.error(new Error("Unsupported quest type selected"));
                     this.backToListNoSave();
                     return;
             }
         }
 
+        /**
+         * Updates the source region via the behavior when the update button is clicked
+         */
         async updateSourceRegion() {
             const input = this.formInputs.regionInput;
 
@@ -193,6 +203,9 @@ import {EditorMode} from "../ts/EditorBehavior";
             }
         }
 
+        /**
+         * Updates the quest description via the behavior when the button is clicked
+         */
         async updateDescription() {
             const input = this.formInputs.descriptionInput;
 
@@ -201,6 +214,10 @@ import {EditorMode} from "../ts/EditorBehavior";
             }
         }
 
+        /**
+         * Adds an objective when the "add objective" button is clicked. Performs basic validation
+         * to ensure the objective title is filled.
+         */
         async addObjective() {
             const input = this.formInputs.objectiveTitleInput;
 
@@ -211,16 +228,28 @@ import {EditorMode} from "../ts/EditorBehavior";
             }
         }
 
+        /**
+         * Delete an objective when the "x" button is clicked via the behavior.
+         * @param objective The objective to delete
+         */
         async deleteObjectiveFromInterface(objective: Objective) {
             await this.behavior.removeObjective(objective.id);
             this.objectivesList.splice(this.objectivesList.indexOf(objective), 1);
         }
 
+        /**
+         * Updates the "complete" state of an objective when an objective checkbox is checked
+         * @param objective
+         */
         async updateObjectiveComplete(objective: Objective) {
             // Bound value will not be updated when this is invoked, so use inverse of completed value
             return this.behavior.updateObjectiveCompleted(objective.id, !objective.completed);
         }
 
+        /**
+         * Updates the text of an objective when the "update" button is pressed
+         * @param objective
+         */
         async updateObjectiveText(objective: Objective) {
             if (objective.text.length !== 0) {
                 return this.behavior.updateObjectiveText(objective.id, objective.text);
@@ -230,6 +259,9 @@ import {EditorMode} from "../ts/EditorBehavior";
             }
         }
 
+        /**
+         * Retrieves the form inputs on the page
+         */
         private get formInputs(): FormInputs {
             return {
                 nameInput: <HTMLInputElement> this.$refs["nameInput"],
@@ -241,6 +273,11 @@ import {EditorMode} from "../ts/EditorBehavior";
             };
         }
 
+        /**
+         * Returns true if the text box specified is filled with text. Marks textbox invalid if not.
+         *
+         * @param element The text box to validate
+         */
         private static checkFilledAndMarkInvalidOtherwise(element: HTMLInputElement): boolean {
             const inputFilled = element.value.length > 0;
 
