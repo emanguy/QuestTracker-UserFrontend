@@ -57,6 +57,7 @@ enum HttpMethod {
     DELETE = "DELETE"
 }
 
+// TODO change this to HTTPS when Let's Encrypt is configured
 function produceApiPath(path: string) : string {
     return `http://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
 }
