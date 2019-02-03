@@ -17,6 +17,11 @@ export default new Router({
       path: '/quest/:questId',
       name: 'questDetail',
       component: () => import(/* webpackChunkName: "q-detail" */ './views/QuestDetail.vue')
+    },
+    {
+      path: "/admin",
+      name: "adminPage",
+      component: () => import(/* webpackChunkName: "admin" */ "./views/Admin.vue")
     }
   ]
 })

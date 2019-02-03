@@ -18,7 +18,7 @@
                     <!-- Container for quest description -->
                     <div class="padded">
                         <h2 class="section-heading">Quest Description</h2>
-                        {{selectedQuest.description}}
+                        <p v-for="line of questDescriptionLines">{{line}}<br></p>
                     </div>
                 </div>
             </div>
@@ -29,13 +29,15 @@
 
 <script lang="ts">
     import {Component} from "vue-property-decorator";
-    import QuestListInheritor from "../ts/QuestListInheritor";
+    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
     import {Quest, QuestType} from "common-interfaces/QuestInterfaces";
     import ErrorBox from "../components/ErrorBox.vue";
+    import {mixins} from "vue-class-component";
+
     @Component({
         components: {ErrorBox}
     })
-    export default class QuestDetailPage extends QuestListInheritor {
+    export default class QuestDetailPage extends mixins(QuestListInheritorMixin) {
         private defaultQuest: Quest = {
             id: "undefined",
             visible: true,
@@ -56,6 +58,13 @@
 
             return questMatchingId;
         }
+
+        /**
+         * Splits the quest description by LF characters so the description actually appears in paragraphs as intended
+         */
+        get questDescriptionLines() {
+            return this.selectedQuest.description.split("\n");
+        }
     }
 </script>
 
@@ -73,8 +82,8 @@
       margin-right: 10%;
 
       @include on-device-type(mobile) {
-          margin-left: 0;
-          margin-right: 0;
+          margin-left: 8px;
+          margin-right: 8px;
       }
   }
 

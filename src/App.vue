@@ -1,12 +1,24 @@
 <template>
   <div id="app">
-    <router-view :questList="questList" :backendError="backendError"/>
+    <header class="horizontal-flexbox">
+      <router-link class="no-link-decor" :to="{ name: 'questList' }">
+        <h3>Quest Tracker</h3>
+      </router-link>
+      <div class="flex-fill"></div>
+      <router-link :to="{ name: 'adminPage' }">
+        <h3>DM Login</h3>
+      </router-link>
+    </header>
+
+    <keep-alive>
+      <router-view :quest-list="questList" :backend-error="backendError"/>
+    </keep-alive>
   </div>
 </template>
 
 <script lang="ts">
-    import { Component, Vue } from "vue-property-decorator";
-    import { Quest } from "common-interfaces/QuestInterfaces";
+    import {Component, Vue} from "vue-property-decorator";
+    import {Quest} from "common-interfaces/QuestInterfaces";
     import {getFullQuestList, QuestUpdateListener} from "./ts/BackendConnector";
     import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "./ts/QuestListPatcher";
 

@@ -5,10 +5,16 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test": "yarn test:unit",
     "test:unit": "vue-cli-service test:unit 'tests/**/*.ts'"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/uuid": "^3.4.4",
+    "bcryptjs": "^2.4.3",
     "common-interfaces": "github:emanguy/QuestTracker-CommonInterfaces#1.2.1",
+    "nonce": "^1.0.4",
+    "uuid": "^3.3.2",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",

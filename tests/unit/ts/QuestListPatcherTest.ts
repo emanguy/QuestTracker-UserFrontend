@@ -9,12 +9,8 @@ import {
     QuestType,
     QuestUpdate
 } from "common-interfaces";
-import {
-    patchQuestListOnAdd,
-    patchQuestListOnDelete,
-    patchQuestListOnUpdate,
-    UpdateTargetNotFoundError
-} from "../../../src/ts/QuestListPatcher";
+import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "@/ts/QuestListPatcher";
+import UpdateTargetNotFoundError from "@/ts/UpdateTargetNotFoundError";
 import {expect} from 'chai';
 
 describe("Quest list patchers", () => {

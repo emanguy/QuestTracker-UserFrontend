@@ -1,19 +1,20 @@
-import {QuestType} from "common-interfaces/QuestInterfaces";
 <template>
     <transition name="list-zoom">
-        <div id="side-spacer">
+        <div class="side-spacer">
             <span id="title-span" class="center">
-                <h1 id="main-title" class="heading text-on-primary rounded-container">ACTIVE QUESTS</h1>
+                <h1 id="main-title" class="heading dark-primary-background rounded-container">ACTIVE QUESTS</h1>
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
-            <div id="main-quest-container" class="vertical-flexbox" v-if="questList.length > 0">
-                <quest-chip
-                        v-for="quest of questList"
-                        :key="quest.id"
-                        :quest="quest"
-                        :class="{invisibleQuest: !(quest.visible)}"
-                />
+            <div id="main-quest-container" class="vertical-flexbox" v-if="!noQuestsVisible()">
+                <router-link
+                    v-for="quest of questList"
+                    :key="quest.id"
+                    :class="{invisibleQuest: !(quest.visible), 'no-link-decor': true}"
+                    :to="{ name: 'questDetail', params: { questId: quest.id }}"
+                >
+                    <quest-chip :quest="quest"/>
+                </router-link>
             </div>
             <div id="no-quests" v-else class="rounded-container">No quests</div>
         </div>
@@ -21,15 +22,26 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component} from 'vue-property-decorator';
     import QuestChip from "../components/QuestChip.vue";
     import ErrorBox from "../components/ErrorBox.vue";
-    import QuestListInheritor from "../ts/QuestListInheritor";
+    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import {Quest} from "common-interfaces";
+    import {mixins} from "vue-class-component";
 
     @Component({
         components: {QuestChip, ErrorBox}
     })
-    export default class QuestList extends QuestListInheritor {
+    export default class QuestList extends mixins(QuestListInheritorMixin) {
+
+        /**
+         * Returns true if there are no quests in the quest list or none are visible.
+         */
+        noQuestsVisible() : boolean {
+            return this.questList.length === 0 || this.questList.reduce((prevValue: boolean, currentValue: Quest) => {
+                return prevValue && !currentValue.visible;
+            }, true);
+        }
     }
 </script>
 
@@ -45,15 +57,7 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
         display: inline-block;
         background-color: $themePrimaryColorDark;
     }
-    #side-spacer {
-        padding-left: 25%;
-        padding-right: 25%;
 
-        @include on-device-type(mobile) {
-            padding-left: 0;
-            padding-right: 0;
-        }
-    }
     #main-quest-container {
         justify-content: center;
 
@@ -65,6 +69,7 @@ import {QuestType} from "common-interfaces/QuestInterfaces";
     #no-quests {
         background: white;
     }
+
     .invisibleQuest {
         display: none;
     }

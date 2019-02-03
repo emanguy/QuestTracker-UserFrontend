@@ -10,6 +10,18 @@ $standardFont: "Scope One", serif;
 $borderRounding: 16px;
 $transitionDuration: 0.25s;
 
+body {
+  margin: 0;
+}
+
+header {
+  background-color: $themeAccentColor;
+  color: $onAccentColor;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-bottom: 8px;
+}
+
 .heading {
   font-size: 4em;
 
@@ -45,7 +57,13 @@ $transitionDuration: 0.25s;
   color: $onAccentColor;
 }
 
-.text-on-primary {
+.primary-color-background {
+  background-color: $themePrimaryColor;
+  color: $onPrimaryColor;
+}
+
+.dark-primary-background {
+  background-color: $themePrimaryColorDark;
   color: $onPrimaryColor;
 }
 
@@ -77,8 +95,27 @@ $transitionDuration: 0.25s;
   flex: 1;
 }
 
+.side-spacer {
+   padding-left: 25%;
+   padding-right: 25%;
+
+   @include on-device-type(mobile) {
+     padding-left: 4px;
+     padding-right: 4px;
+   }
+ }
+
 .material-icons {
   vertical-align: middle;
+}
+
+.no-link-decor { // Makes the implicit "a" tag beneath the router-link not underline everything
+  text-decoration: none;
+  color: inherit;
+}
+
+a {
+  color: $onAccentColor;
 }
 
 p {
