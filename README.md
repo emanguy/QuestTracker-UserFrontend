@@ -1,4 +1,4 @@
-# Quest Tracker User Frontend
+# Quest Tracker User Frontend [![Build Status](https://travis-ci.org/emanguy/QuestTracker-UserFrontend.svg?branch=master)](https://travis-ci.org/emanguy/QuestTracker-UserFrontend)
 
 This is the frontend vue app for the quest tracker. To get started, create a `.env` and `.env.development` file
 so you can fill in the settings for the backend connector.
