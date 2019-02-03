@@ -10,6 +10,7 @@ so you can fill in the settings for the backend connector.
 * `VUE_APP_BACKEND_API_ROOT_PATH` - This should be the base path for the frontend API. I did this so that the static content,
 frontend API, and notification service could all be hosted on the same Kubernetes ingress, just with different paths. On development
 mode, it should just be left blank but in production it should be something like `/api/v1`
+* `VUE_APP_BACKEND_UPDATE_ROOT_PATH` - This is the base path for the backend notification service.
 
 ## Local development
 
