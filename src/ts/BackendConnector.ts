@@ -63,7 +63,7 @@ function produceApiPath(path: string) : string {
 }
 
 function produceListenerPath(path: string) : string {
-    return `http://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
+    return `http://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_UPDATE_ROOT_PATH}/${path}`;
 }
 
 function applyAuthCredentials(credentials: ApiCredentials) : Record<string, string> {
