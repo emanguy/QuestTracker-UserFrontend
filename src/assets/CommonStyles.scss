@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css?family=Scope+One|Material+Icons');
+@import "ResponsiveMixin";
+
+$themePrimaryColor: #45341F;
+$themePrimaryColorDark: #310a0b;
+$onPrimaryColor: #ffffff;
+$themeAccentColor: #4e4d23;
+$onAccentColor: #ffffff;
+$standardFont: "Scope One", serif;
+$borderRounding: 16px;
+$transitionDuration: 0.25s;
+
+body {
+  margin: 0;
+}
+
+header {
+  background-color: $themeAccentColor;
+  color: $onAccentColor;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-bottom: 8px;
+}
+
+.heading {
+  font-size: 4em;
+
+  @include on-device-type(mobile) {
+    font-size: 2.5em;
+  }
+}
+
+.section-heading {
+  font-size: 1.5em;
+
+  @include on-device-type(mobile) {
+    font-size: 1.5em;
+  }
+}
+
+.title {
+  font-size: 2em;
+
+  @include on-device-type(mobile) {
+    font-size: 1.5em;
+  }
+}
+
+@include on-device-type(mobile) {
+  .not-on-mobile {
+    display: none;
+  }
+}
+
+.accent-background {
+  background-color: $themeAccentColor;
+  color: $onAccentColor;
+}
+
+.primary-color-background {
+  background-color: $themePrimaryColor;
+  color: $onPrimaryColor;
+}
+
+.dark-primary-background {
+  background-color: $themePrimaryColorDark;
+  color: $onPrimaryColor;
+}
+
+.center {
+  text-align: center;
+}
+
+.rounded-container {
+  border-radius: $borderRounding;
+  border: 1px solid gray;
+  padding: 16px;
+}
+
+.padded {
+  padding: 16px;
+}
+
+.vertical-flexbox {
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal-flexbox {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-fill {
+  flex: 1;
+}
+
+.side-spacer {
+   padding-left: 25%;
+   padding-right: 25%;
+
+   @include on-device-type(mobile) {
+     padding-left: 4px;
+     padding-right: 4px;
+   }
+ }
+
+.material-icons {
+  vertical-align: middle;
+}
+
+.no-link-decor { // Makes the implicit "a" tag beneath the router-link not underline everything
+  text-decoration: none;
+  color: inherit;
+}
+
+a {
+  color: $onAccentColor;
+}
+
+p {
+  margin: 0;
+}
+
+ul.checklist {
+  padding: 0;
+  list-style-type: none;
+}
+
+ul.checklist li:before {
+  content: "check_box_outline_blank";
+  font-family: "Material Icons", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  color: $themePrimaryColor;
+  margin-right: 16px;
+  vertical-align: middle;
+}
+
+ul.checklist li.checked:before {
+  content: "check_box";
+  color: $themePrimaryColor;
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background-color: $themeAccentColor;
+}
+
+h3 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+

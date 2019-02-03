@@ -1,29 +1,89 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <header class="horizontal-flexbox">
+      <router-link class="no-link-decor" :to="{ name: 'questList' }">
+        <h3>Quest Tracker</h3>
+      </router-link>
+      <div class="flex-fill"></div>
+      <router-link :to="{ name: 'adminPage' }">
+        <h3>DM Login</h3>
+      </router-link>
+    </header>
+
+    <keep-alive>
+      <router-view :quest-list="questList" :backend-error="backendError"/>
+    </keep-alive>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script lang="ts">
+    import {Component, Vue} from "vue-property-decorator";
+    import {Quest} from "common-interfaces/QuestInterfaces";
+    import {getFullQuestList, QuestUpdateListener} from "./ts/BackendConnector";
+    import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "./ts/QuestListPatcher";
+
+    @Component
+    export default class MainAppComponent extends Vue {
+        questList: Quest[] = [];
+        backendError: Error|null = null;
+        badResponseRetries: number = 0;
+        backendUpdateListener: QuestUpdateListener = new QuestUpdateListener();
+        retrieveQuestsMethod: () => Promise<Quest[]> = getFullQuestList;
+
+        mounted() {
+            this.initializeListeners()
+        }
+
+        initializeListeners() {
+            this.backendUpdateListener.createEventListeners.push(update => patchQuestListOnAdd(update, this.questList));
+            this.backendUpdateListener.updateEventListeners.push(update => patchQuestListOnUpdate(update, this.questList));
+            this.backendUpdateListener.deleteEventListeners.push(update => patchQuestListOnDelete(update, this.questList));
+            this.backendUpdateListener.errorEventListeners.push(err => this.refetchQuestListOrErrorOut(err));
+
+            this.setUpQuestList();
+        }
+
+        setUpQuestList() {
+            this.retrieveQuestsMethod()
+                .then((listFromServer) => {
+                    this.questList = listFromServer;
+                    this.backendUpdateListener.startListening();
+                    this.badResponseRetries = 0;
+                })
+                .catch((err) => this.refetchQuestListOrErrorOut(err));
+        }
+
+        stopListeningForUpdates() {
+            if (this.backendUpdateListener != null && this.backendUpdateListener.isListening) {
+                this.backendUpdateListener.stopListening();
+            }
+        }
+
+        refetchQuestListOrErrorOut(err: Error) {
+            console.log(err);
+            this.badResponseRetries = this.badResponseRetries + 1;
+
+            if (this.badResponseRetries < 5) {
+                console.log(`Bad response #${this.badResponseRetries}, trying again.`);
+                this.stopListeningForUpdates();
+                this.setUpQuestList();
+            }
+            else {
+                console.log("Retry limit reached. Displaying error message.");
+                this.backendError = err;
+            }
+        }
     }
-  }
-}
+</script>
+
+<style lang="scss">
+    @import "./assets/CommonStyles.scss";
+
+    html {
+        background: url("./assets/Aragashion-Overworld 20x30_bg.jpg") no-repeat center center fixed;
+        background-size: cover;
+        font-family: $standardFont;
+        overflow-x: hidden;
+        height: 100vh;
+    }
 </style>
