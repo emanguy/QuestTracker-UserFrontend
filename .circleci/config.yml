@@ -1,0 +1,50 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.1.0
+  gcp-gcr: circleci/gcp-gcr@0.11.0
+  cloud-run: circleci/gcp-cloud-run@1.0.2
+
+jobs:
+  deploy-to-cloud-run:
+    executor: cloud-run/default
+    steps:
+      - cloud-run/init:
+          gcloud-service-key: gcp_service_account_key
+          google-project-id: gcp_project_id
+      - cloud-run/deploy:
+          image: "gcr.io/${gcp_project_id}/userfrontend:<< pipeline.git.tag >>"
+          region: ${gcp_region}
+          service-name: frontend-static-content
+          unauthenticated: true
+
+workflows:
+  version: 2
+  run-unit-tests:
+    jobs:
+      - node/test:
+          filters:
+            tags:
+              ignore: /.*/
+          pkg-manager: yarn
+          version: 8.17.0
+  deploy-on-tag:
+    jobs:
+      - gcp-gcr/build-and-push-image:
+          context: "Quest Tracker Data"
+          filters: &deploy-filters
+            branches:
+              ignore: /.*/
+            tags:
+              only: /&\d\.\d\.\d$/
+          gcloud-service-key: gcp_service_account_key
+          google-project-id: gcp_project_id
+          image: userfrontend
+          tag: << pipeline.git.tag >>
+      - deploy-to-cloud-run:
+          context: "Quest Tracker Data"
+          filters:
+            <<: *deploy-filters
+          requires:
+            - gcp-gcr/build-and-push-image
+
