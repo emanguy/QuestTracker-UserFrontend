@@ -36,7 +36,7 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /&\d\.\d\.\d$/
+              only: /^\d\.\d\.\d$/
           gcloud-service-key: gcp_service_account_key
           google-project-id: gcp_project_id
           image: userfrontend
