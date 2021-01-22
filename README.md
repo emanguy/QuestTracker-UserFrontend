@@ -5,6 +5,7 @@ so you can fill in the settings for the backend connector.
 
 ## "Environment" variables
 
+* `VUE_APP_SCHEME` - The website scheme, i.e. "http" or "https"
 * `VUE_APP_BACKEND_HOSTNAME_AND_PORT` - This should be the base URL for the [Frontend API](https://github.com/emanguy/QuestTracker-FrontendApi)
 * `VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT` - This should be the base URL for the [Notification Service](https://github.com/emanguy/QuestTracker-NotificationService)
 * `VUE_APP_BACKEND_API_ROOT_PATH` - This should be the base path for the frontend API. I did this so that the static content,
