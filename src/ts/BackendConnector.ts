@@ -57,13 +57,12 @@ enum HttpMethod {
     DELETE = "DELETE"
 }
 
-// TODO change this to HTTPS when Let's Encrypt is configured
 function produceApiPath(path: string) : string {
-    return `http://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
+    return `${process.env.VUE_APP_SCHEME}://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
 }
 
 function produceListenerPath(path: string) : string {
-    return `http://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_UPDATE_ROOT_PATH}/${path}`;
+    return `${process.env.VUE_APP_SCHEME}://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_UPDATE_ROOT_PATH}/${path}`;
 }
 
 function applyAuthCredentials(credentials: ApiCredentials) : Record<string, string> {
@@ -123,7 +122,7 @@ async function backendTransaction<T = undefined, P = null>(path: string, method:
     }
 
     if (!serverResponse.ok) {
-        let errorDescription = null;
+        let errorDescription: string;
         try {
             const rawResponse = <ErrorDescription> await serverResponse.json();
             console.error(`Bad response from server. Status: ${serverResponse.status} Message: ${rawResponse.message}`);
