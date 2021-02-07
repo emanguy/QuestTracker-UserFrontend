@@ -7,7 +7,7 @@ COPY ./src/ ./src/
 COPY ./public/ ./public/
 COPY ./tests/ ./tests/
 COPY ./types/ ./types/
-COPY [ ".browserslistrc", ".env", "babel.config.js", "package.json", "postcss.config.js", "tsconfig.json", "vue.config.js", "yarn.lock", "./"]
+COPY [ ".browserslistrc", ".env", "package.json", "tsconfig.json", "yarn.lock", "./"]
 RUN yarn install && \
     yarn build
 

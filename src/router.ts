@@ -1,27 +1,24 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import QuestListPage from './views/QuestList.vue'
+import {baseURL} from "./ts/PathGeneration";
 
-Vue.use(Router);
-
-export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+export default createRouter({
+  history: createWebHistory(baseURL),
   routes: [
     {
       path: '/',
       name: 'questList',
-      component: QuestListPage
+      component: QuestListPage,
     },
     {
       path: '/quest/:questId',
       name: 'questDetail',
-      component: () => import(/* webpackChunkName: "q-detail" */ './views/QuestDetail.vue')
+      component: () => import('./views/QuestDetail.vue'),
     },
     {
       path: "/admin",
       name: "adminPage",
-      component: () => import(/* webpackChunkName: "admin" */ "./views/Admin.vue")
+      component: () => import("./views/Admin.vue")
     }
   ]
 })

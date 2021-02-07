@@ -20,26 +20,29 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
+    import {defineComponent, Ref, ref} from "vue";
     import {ApiCredentials, loginWithCredentials} from "../ts/BackendConnector";
 
-    @Component
-    export default class AdminLoginDialog extends Vue {
-        enteredUsername: string = "";
-        enteredPassword: string = "";
-        error: Error|null = null;
-        loginFunction: (username: string, password: string) => Promise<ApiCredentials> = loginWithCredentials;
+    export default defineComponent({
+        setup(_, { emit }) {
+            const enteredUsername = ref("");
+            const enteredPassword = ref("");
+            const error: Ref<Error|null> = ref(null);
+            const loginFunction: (username: string, password: string) => Promise<ApiCredentials> = loginWithCredentials;
 
-        async attemptLogin() {
-            try {
-                const loginCreds = await this.loginFunction(this.enteredUsername, this.enteredPassword);
-                this.$emit("login-success", loginCreds);
+            async function attemptLogin() {
+                try {
+                    const loginCreds = await loginFunction(this.enteredUsername, this.enteredPassword);
+                    emit("login-success", loginCreds);
+                }
+                catch (err) {
+                    emit("login-failure", err);
+                }
             }
-            catch (err) {
-                this.$emit("login-failure", err);
-            }
+
+            return { enteredUsername, enteredPassword, error, attemptLogin };
         }
-    }
+    });
 </script>
 
 <style scoped lang="scss">

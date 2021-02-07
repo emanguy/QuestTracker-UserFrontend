@@ -15,80 +15,102 @@
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
-    import {mixins} from "vue-class-component";
+    import { defineComponent } from "vue";
     import {Quest} from "common-interfaces";
     import QuestChip from "./QuestChip.vue";
-    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
-    import AuthTokenInheritorMixin from "../ts/AuthTokenInheritorMixin";
-    import {deleteQuest, modifyQuest} from "@/ts/BackendConnector";
+    import { useQuestListInheritor } from "../composition/QuestListInheritor";
+    import { useAuthTokenInheritor } from "../composition/AuthTokenInheritor";
+    import {deleteQuest, modifyQuest} from "../ts/BackendConnector";
 
-    @Component({
-        components: {QuestChip}
+    export default defineComponent({
+        components: { QuestChip },
+
+        setup(_, { emit }) {
+            const { authToken } = useAuthTokenInheritor();
+            const { questList } = useQuestListInheritor();
+
+            /**
+             * Throws an error if input is null.
+             */
+            function verify<T>(input: T|null): T {
+                if (input === null) {
+                    throw new Error("Value was null when it shouldn't be!")
+                }
+
+                return input;
+            }
+
+            function visibilityIcon(questVisible: boolean) {
+                if (questVisible) {
+                    return "visibility"
+                }
+                else {
+                    return "visibility_off";
+                }
+            }
+
+            /**
+             * Delete specific quest
+             *
+             * @param id ID of the quest to delete
+             */
+            async function triggerDeleteQuest(id: string) {
+                console.log(`Delete quest ${id}`);
+
+                try {
+                    await deleteQuest(verify(authToken.value), id);
+                }
+                catch (e) {
+                    emit("backend-error", e);
+                }
+            }
+
+            /**
+             * Toggle visibility of quest
+             *
+             * @param id ID of quest to toggle visibility on
+             * @param currentlyVisible True if the quest is currently visible
+             */
+            async function toggleQuestVisibility(id: string, currentlyVisible: boolean) {
+                console.log(`Toggle visibility for quest ${id}`);
+
+                try {
+                    await modifyQuest(verify(authToken.value), id, {visible: !currentlyVisible});
+                }
+                catch (e) {
+                    emit("backend-error", e);
+                }
+            }
+
+            /**
+             * Enter editor view for specific quest
+             *
+             * @param quest The quest to edit
+             */
+            function editQuest(quest: Quest) {
+                console.log(`Enter editor for quest ${quest.id}`);
+                emit("edit-quest", quest);
+            }
+
+            /**
+             * Enter editor view to create new quest
+             */
+            function newQuest() {
+                console.log("Create new quest");
+                emit("add-quest");
+            }
+
+            return {
+                questList,
+
+                visibilityIcon,
+                triggerDeleteQuest,
+                toggleQuestVisibility,
+                editQuest,
+                newQuest,
+            }
+        }
     })
-    export default class QuestEditorList extends mixins(QuestListInheritorMixin, AuthTokenInheritorMixin) {
-
-        visibilityIcon(questVisible: boolean) {
-            if (questVisible) {
-                return "visibility"
-            }
-            else {
-                return "visibility_off";
-            }
-        }
-
-        /**
-         * Delete specific quest
-         *
-         * @param id ID of the quest to delete
-         */
-        async triggerDeleteQuest(id: string) {
-            console.log(`Delete quest ${id}`);
-
-            try {
-                await deleteQuest(this.authToken, id);
-            }
-            catch (e) {
-                this.$emit("backend-error", e);
-            }
-        }
-
-        /**
-         * Toggle visibility of quest
-         *
-         * @param id ID of quest to toggle visibility on
-         * @param currentlyVisible True if the quest is currently visible
-         */
-        async toggleQuestVisibility(id: string, currentlyVisible: boolean) {
-            console.log(`Toggle visibility for quest ${id}`);
-            console.log(this.authToken);
-
-            try {
-                await modifyQuest(this.authToken, id, {visible: !currentlyVisible});
-            }
-            catch (e) {
-                this.$emit("backend-error", e);
-            }
-        }
-
-        /**
-         * Enter editor view for specific quest
-         *
-         * @param quest The quest to edit
-         */
-        editQuest(quest: Quest) {
-            console.log(`Enter editor for quest ${quest.id}`);
-            this.$emit("edit-quest", quest);
-        }
-
-        /**
-         * Enter editor view to create new quest
-         */
-        newQuest() {
-            console.log("Create new quest");
-            this.$emit("add-quest");
-        }
-    }
 </script>
 
 <style scoped lang="scss">

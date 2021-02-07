@@ -1,79 +1,104 @@
 <template>
-  <div id="app">
-    <header class="horizontal-flexbox">
-      <router-link class="no-link-decor" :to="{ name: 'questList' }">
-        <h3>Quest Tracker</h3>
-      </router-link>
-      <div class="flex-fill"></div>
-      <router-link :to="{ name: 'adminPage' }">
-        <h3>DM Login</h3>
-      </router-link>
-    </header>
+    <div id="app">
+        <header class="horizontal-flexbox">
+            <router-link class="no-link-decor" :to="{ name: 'questList' }">
+                <h3>Quest Tracker</h3>
+            </router-link>
+            <div class="flex-fill"></div>
+            <router-link :to="{ name: 'adminPage' }">
+                <h3>DM Login</h3>
+            </router-link>
+        </header>
 
-    <keep-alive>
-      <router-view :quest-list="questList" :backend-error="backendError"/>
-    </keep-alive>
-  </div>
+        <router-view v-slot="{ Component, route }">
+            <keep-alive>
+                <component :is="Component"></component>
+            </keep-alive>
+        </router-view>
+    </div>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
+import {defineComponent, ref, provide, onMounted, Ref, PropType} from 'vue';
     import {Quest} from "common-interfaces/QuestInterfaces";
     import {getFullQuestList, QuestUpdateListener} from "./ts/BackendConnector";
     import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "./ts/QuestListPatcher";
+    import {QUEST_LIST_KEY, BACKEND_ERROR_KEY} from "./composition/QuestListInheritor";
 
-    @Component
-    export default class MainAppComponent extends Vue {
-        questList: Quest[] = [];
-        backendError: Error|null = null;
-        badResponseRetries: number = 0;
-        backendUpdateListener: QuestUpdateListener = new QuestUpdateListener();
-        retrieveQuestsMethod: () => Promise<Quest[]> = getFullQuestList;
-
-        mounted() {
-            this.initializeListeners()
-        }
-
-        initializeListeners() {
-            this.backendUpdateListener.createEventListeners.push(update => patchQuestListOnAdd(update, this.questList));
-            this.backendUpdateListener.updateEventListeners.push(update => patchQuestListOnUpdate(update, this.questList));
-            this.backendUpdateListener.deleteEventListeners.push(update => patchQuestListOnDelete(update, this.questList));
-            this.backendUpdateListener.errorEventListeners.push(err => this.refetchQuestListOrErrorOut(err));
-
-            this.setUpQuestList();
-        }
-
-        setUpQuestList() {
-            this.retrieveQuestsMethod()
-                .then((listFromServer) => {
-                    this.questList = listFromServer;
-                    this.backendUpdateListener.startListening();
-                    this.badResponseRetries = 0;
-                })
-                .catch((err) => this.refetchQuestListOrErrorOut(err));
-        }
-
-        stopListeningForUpdates() {
-            if (this.backendUpdateListener != null && this.backendUpdateListener.isListening) {
-                this.backendUpdateListener.stopListening();
+    export default defineComponent({
+        props: {
+            retrieveQuestsMethod: {
+                type: Function as PropType<() => Promise<Array<Quest>> >,
+                default: getFullQuestList,
+            },
+            backendUpdateListener: {
+                type: Object as PropType<QuestUpdateListener>,
+                default: () => new QuestUpdateListener(),
             }
-        }
+        },
 
-        refetchQuestListOrErrorOut(err: Error) {
-            console.log(err);
-            this.badResponseRetries = this.badResponseRetries + 1;
+        setup(props) {
+            let questList = ref<Array<Quest>>([]);
+            let backendError: Ref<Error|null> = ref(null);
 
-            if (this.badResponseRetries < 5) {
-                console.log(`Bad response #${this.badResponseRetries}, trying again.`);
-                this.stopListeningForUpdates();
-                this.setUpQuestList();
+            provide(QUEST_LIST_KEY, questList);
+            provide(BACKEND_ERROR_KEY, backendError);
+
+            let badResponseRetries: Ref<number> = ref(0);
+
+            function refetchQuestListOrErrorOut(err: Error) {
+                console.log(err);
+                badResponseRetries.value = badResponseRetries.value + 1;
+
+                if (badResponseRetries.value < 5) {
+                    console.log(`Bad response #${badResponseRetries.value}, trying again.`);
+                    stopListeningForUpdates();
+                    setUpQuestList();
+                }
+                else {
+                    console.log("Retry limit reached. Displaying error message.");
+                    backendError.value = err;
+                }
             }
-            else {
-                console.log("Retry limit reached. Displaying error message.");
-                this.backendError = err;
+
+            async function setUpQuestList() {
+                let listFromServer: Array<Quest>;
+
+                try {
+                    listFromServer = await props.retrieveQuestsMethod();
+                    questList.value = listFromServer;
+                    props.backendUpdateListener.startListening();
+                    badResponseRetries.value = 0;
+                } catch(err) {
+                    refetchQuestListOrErrorOut(err);
+                    return;
+                }
             }
+
+            function stopListeningForUpdates() {
+                if (props.backendUpdateListener?.isListening) {
+                    props.backendUpdateListener.stopListening();
+                }
+            }
+
+            function initializeListeners() {
+                props.backendUpdateListener.createEventListeners.push(update => patchQuestListOnAdd(update, questList.value));
+                props.backendUpdateListener.updateEventListeners.push(update => patchQuestListOnUpdate(update, questList.value));
+                props.backendUpdateListener.deleteEventListeners.push(update => patchQuestListOnDelete(update, questList.value));
+                props.backendUpdateListener.errorEventListeners.push(err => refetchQuestListOrErrorOut(err));
+
+                setUpQuestList();
+            }
+            onMounted(() => initializeListeners());
+
+
+            return {
+                questList,
+                backendError,
+                badResponseRetries,
+            };
         }
-    }
+    });
 </script>
 
 <style lang="scss">
@@ -86,4 +111,6 @@
         overflow-x: hidden;
         height: 100vh;
     }
+
+
 </style>

@@ -6,12 +6,12 @@
             </span>
             <error-box :backendError="backendError"></error-box>
             <hr>
-            <div id="main-quest-container" class="vertical-flexbox" v-if="!noQuestsVisible()">
+            <div id="main-quest-container" class="vertical-flexbox" v-if="!noQuestsVisible">
                 <router-link
-                    v-for="quest of questList"
-                    :key="quest.id"
-                    :class="{invisibleQuest: !(quest.visible), 'no-link-decor': true}"
-                    :to="{ name: 'questDetail', params: { questId: quest.id }}"
+                        v-for="quest of questList"
+                        :key="quest.id"
+                        :class="{invisibleQuest: !(quest.visible), 'no-link-decor': true}"
+                        :to="{ name: 'questDetail', params: { questId: quest.id }}"
                 >
                     <quest-chip :quest="quest"/>
                 </router-link>
@@ -22,27 +22,27 @@
 </template>
 
 <script lang="ts">
-    import {Component} from 'vue-property-decorator';
     import QuestChip from "../components/QuestChip.vue";
     import ErrorBox from "../components/ErrorBox.vue";
-    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import { useQuestListInheritor } from "../composition/QuestListInheritor";
     import {Quest} from "common-interfaces";
-    import {mixins} from "vue-class-component";
+    import {computed, defineComponent} from "vue";
 
-    @Component({
-        components: {QuestChip, ErrorBox}
-    })
-    export default class QuestList extends mixins(QuestListInheritorMixin) {
+    export default defineComponent({
+        components: { QuestChip, ErrorBox },
+        setup() {
+            const { questList, backendError } = useQuestListInheritor();
 
-        /**
-         * Returns true if there are no quests in the quest list or none are visible.
-         */
-        noQuestsVisible() : boolean {
-            return this.questList.length === 0 || this.questList.reduce((prevValue: boolean, currentValue: Quest) => {
-                return prevValue && !currentValue.visible;
-            }, true);
+            /**
+             * Returns true if there are no quests in the quest list or none are visible.
+             */
+            const noQuestsVisible = computed(() =>
+                    questList.value.length === 0 || questList.value.reduce((prevValue: boolean, currentValue: Quest) => prevValue && !currentValue.visible, true)
+            );
+
+            return { questList, backendError, noQuestsVisible };
         }
-    }
+    });
 </script>
 
 <style scoped lang="scss">
@@ -75,7 +75,7 @@
     }
 
     /* CSS transition for the above transition element */
-    .list-zoom-enter, .list-zoom-leave-to {
+    .list-zoom-enter-from, .list-zoom-leave-to {
         transform: scale(1.5);
         opacity: 0;
     }
@@ -84,7 +84,8 @@
         transition: transform $transitionDuration, opacity $transitionDuration;
         overflow: hidden;
         position: fixed;
-        width: 50%;
+        box-sizing: border-box;
+        width: 100%;
 
         @include on-device-type(mobile) {
             width: calc(100% - 16px); // HTML body adds 8px margin
