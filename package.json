@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vite",
-    "build": "vuedx-typecheck . && vite build",
+    "build": "vite build",
     "test": "jest"
   },
   "dependencies": {

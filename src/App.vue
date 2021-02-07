@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, provide, onMounted, Ref, PropType} from 'vue';
+    import {defineComponent, ref, provide, onMounted, Ref, PropType} from 'vue';
     import {Quest} from "common-interfaces/QuestInterfaces";
     import {getFullQuestList, QuestUpdateListener} from "./ts/BackendConnector";
     import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "./ts/QuestListPatcher";
