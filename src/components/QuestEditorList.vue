@@ -21,6 +21,7 @@
     import { useQuestListInheritor } from "../composition/QuestListInheritor";
     import { useAuthTokenInheritor } from "../composition/AuthTokenInheritor";
     import {deleteQuest, modifyQuest} from "../ts/BackendConnector";
+    import {assertExists} from "../ts/Assertions";
 
     export default defineComponent({
         components: { QuestChip },
@@ -28,17 +29,6 @@
         setup(_, { emit }) {
             const { authToken } = useAuthTokenInheritor();
             const { questList } = useQuestListInheritor();
-
-            /**
-             * Throws an error if input is null.
-             */
-            function verify<T>(input: T|null): T {
-                if (input === null) {
-                    throw new Error("Value was null when it shouldn't be!")
-                }
-
-                return input;
-            }
 
             function visibilityIcon(questVisible: boolean) {
                 if (questVisible) {
@@ -58,7 +48,7 @@
                 console.log(`Delete quest ${id}`);
 
                 try {
-                    await deleteQuest(verify(authToken.value), id);
+                    await deleteQuest(assertExists(authToken.value), id);
                 }
                 catch (e) {
                     emit("backend-error", e);
@@ -75,7 +65,7 @@
                 console.log(`Toggle visibility for quest ${id}`);
 
                 try {
-                    await modifyQuest(verify(authToken.value), id, {visible: !currentlyVisible});
+                    await modifyQuest(assertExists(authToken.value), id, {visible: !currentlyVisible});
                 }
                 catch (e) {
                     emit("backend-error", e);

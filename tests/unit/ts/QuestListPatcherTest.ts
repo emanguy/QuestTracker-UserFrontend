@@ -55,7 +55,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnAdd(addRequest, questList);
 
-        expect(questList).toMatchObject([ questToAdd ]);
+        expect(questList).toEqual([ questToAdd ]);
     });
 
     it("can add new objectives to existing quests", () => {
@@ -70,7 +70,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnAdd(addRequest, questList);
 
-        expect(questList[1].objectives).toMatchObject([objectiveTwo]);
+        expect(questList[1].objectives).toEqual([objectiveTwo]);
     });
 
     it("throws an exception when a quest cannot be found on objective add", () => {
@@ -171,7 +171,7 @@ describe("Quest list patchers", () => {
         questList.push(questToAdd, questToAdd2);
         patchQuestListOnDelete(deletionRequest, questList);
 
-        expect(questList).toMatchObject([questToAdd2]);
+        expect(questList).toEqual([questToAdd2]);
     });
 
     it("throws an exception when a quest could not be found for deletion", () => {
@@ -198,7 +198,7 @@ describe("Quest list patchers", () => {
         questToAdd2.objectives.push(objectiveOne);
         patchQuestListOnDelete(deletionRequest, questList);
 
-        expect(questList).toMatchObject(expectedQuestList);
+        expect(questList).toEqual(expectedQuestList);
     });
 
     it("throws an exception when an objective could not be found for deletion", () => {

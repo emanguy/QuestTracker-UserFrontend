@@ -1,6 +1,3 @@
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
 <template>
     <div>
         <div class="center">

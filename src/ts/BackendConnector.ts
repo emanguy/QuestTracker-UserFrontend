@@ -184,7 +184,7 @@ export async function loginWithCredentials(username: string, password: string) :
 }
 
 export async function deauthCredentials(credentials: ApiCredentials) : Promise<void> {
-    return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE);
+    return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE, undefined, undefined, false);
 }
 
 export async function createQuest(credentials: ApiCredentials, newQuest: RestBodyQuest) : Promise<void> {

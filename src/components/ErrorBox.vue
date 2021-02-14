@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-    import {computed, defineComponent} from "vue";
+import {computed, defineComponent, PropType} from "vue";
     import {BackendOfflineError, BadHTTPCodeError, MalformedResponseError} from "../ts/BackendConnector";
 
     export default defineComponent({
@@ -19,7 +19,7 @@
                 default: true,
             },
             specialHttpStatusMessages: {
-                type: Object,
+                type: Object as PropType<{[code: number]: string}>,
                 default: () => {},
             },
         },

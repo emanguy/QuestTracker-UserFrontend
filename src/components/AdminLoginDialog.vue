@@ -20,19 +20,18 @@
 </template>
 
 <script lang="ts">
-    import {defineComponent, Ref, ref} from "vue";
+    import {defineComponent, ref} from "vue";
     import {ApiCredentials, loginWithCredentials} from "../ts/BackendConnector";
 
     export default defineComponent({
         setup(_, { emit }) {
             const enteredUsername = ref("");
             const enteredPassword = ref("");
-            const error: Ref<Error|null> = ref(null);
             const loginFunction: (username: string, password: string) => Promise<ApiCredentials> = loginWithCredentials;
 
             async function attemptLogin() {
                 try {
-                    const loginCreds = await loginFunction(this.enteredUsername, this.enteredPassword);
+                    const loginCreds = await loginFunction(enteredUsername.value, enteredPassword.value);
                     emit("login-success", loginCreds);
                 }
                 catch (err) {
@@ -40,7 +39,7 @@
                 }
             }
 
-            return { enteredUsername, enteredPassword, error, attemptLogin };
+            return { enteredUsername, enteredPassword, attemptLogin };
         }
     });
 </script>
