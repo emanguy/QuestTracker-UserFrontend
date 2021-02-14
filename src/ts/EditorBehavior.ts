@@ -7,8 +7,8 @@ import {
     deleteObjective,
     modifyObjective,
     modifyQuest
-} from "@/ts/BackendConnector";
-import UpdateTargetNotFoundError from "@/ts/UpdateTargetNotFoundError";
+} from "./BackendConnector";
+import UpdateTargetNotFoundError from "./UpdateTargetNotFoundError";
 
 export enum EditorMode {
     ADD = "add",

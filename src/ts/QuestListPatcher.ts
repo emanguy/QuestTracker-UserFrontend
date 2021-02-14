@@ -8,7 +8,7 @@ import {
     Quest,
     QuestUpdate
 } from "common-interfaces/QuestInterfaces";
-import UpdateTargetNotFoundError from "@/ts/UpdateTargetNotFoundError";
+import UpdateTargetNotFoundError from "./UpdateTargetNotFoundError";
 
 interface QuestAndIndex {
     index: number

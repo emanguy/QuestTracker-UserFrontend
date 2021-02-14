@@ -1,6 +1,3 @@
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
-import {EditorMode} from "../ts/EditorBehavior";
 <template>
     <div>
         <div class="center">
@@ -11,8 +8,6 @@ import {EditorMode} from "../ts/EditorBehavior";
         <hr>
         <component
                 :is="currentEditorView"
-                :quest-list="questList"
-                :auth-token="authToken"
                 :quest-to-edit="selectedQuest"
                 :edit-mode="editMode"
                 @edit-quest="editQuest"
@@ -23,51 +18,59 @@ import {EditorMode} from "../ts/EditorBehavior";
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
-    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import {defineComponent, ref, Ref} from "vue";
     import {Quest} from "common-interfaces";
-    import {mixins} from "vue-class-component";
-    import AuthTokenInheritorMixin from "@/ts/AuthTokenInheritorMixin";
-    import QuestEditorAddUpdate from "@/components/QuestEditorAddUpdate.vue";
+    import QuestEditorAddUpdate from "./QuestEditorAddUpdate.vue";
     import QuestEditorList from "./QuestEditorList.vue";
-    import {EditorMode} from "@/ts/EditorBehavior";
+    import {EditorMode} from "../ts/EditorBehavior";
 
     enum EditorViewState {
         LIST = "QuestEditorList",
         EDIT = "QuestEditorAddUpdate"
     }
 
-    @Component({
-        components: {QuestEditorList, QuestEditorAddUpdate}
+    export default defineComponent({
+        components: {QuestEditorList, QuestEditorAddUpdate},
+        setup(_, { emit }) {
+            const currentEditorView: Ref<EditorViewState> = ref(EditorViewState.LIST);
+            const editMode: Ref<EditorMode> = ref(EditorMode.ADD);
+            const selectedQuest: Ref<Quest|null> = ref(null);
+
+            function editQuest(quest: Quest) {
+                selectedQuest.value = quest;
+                editMode.value = EditorMode.UPDATE;
+                currentEditorView.value = EditorViewState.EDIT;
+            }
+
+            function addQuest() {
+                selectedQuest.value = null;
+                editMode.value = EditorMode.ADD;
+                currentEditorView.value = EditorViewState.EDIT;
+            }
+
+            function backToList() {
+                selectedQuest.value = null;
+                currentEditorView.value = EditorViewState.LIST;
+            }
+
+            function logout() {
+                selectedQuest.value = null;
+                currentEditorView.value = EditorViewState.LIST;
+                emit("logout-request");
+            }
+
+            return {
+                currentEditorView,
+                editMode,
+                selectedQuest,
+
+                editQuest,
+                addQuest,
+                backToList,
+                logout,
+            };
+        }
     })
-    export default class AdminQuestEditor extends mixins(QuestListInheritorMixin, AuthTokenInheritorMixin) {
-        currentEditorView: EditorViewState = EditorViewState.LIST;
-        editMode: EditorMode = EditorMode.ADD;
-        selectedQuest: Quest|null = null;
-
-        editQuest(quest: Quest) {
-            this.selectedQuest = quest;
-            this.editMode = EditorMode.UPDATE;
-            this.currentEditorView = EditorViewState.EDIT;
-        }
-
-        addQuest() {
-            this.selectedQuest = null;
-            this.editMode = EditorMode.ADD;
-            this.currentEditorView = EditorViewState.EDIT;
-        }
-
-        backToList() {
-            this.selectedQuest = null;
-            this.currentEditorView = EditorViewState.LIST;
-        }
-
-        logout() {
-            this.selectedQuest = null;
-            this.currentEditorView = EditorViewState.LIST;
-            this.$emit("logout-request");
-        }
-    }
 </script>
 
 <style scoped lang="scss">

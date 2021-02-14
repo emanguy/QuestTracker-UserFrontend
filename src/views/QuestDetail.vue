@@ -28,44 +28,39 @@
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
-    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
+    import { useQuestListInheritor } from "../composition/QuestListInheritor";
     import {Quest, QuestType} from "common-interfaces/QuestInterfaces";
     import ErrorBox from "../components/ErrorBox.vue";
-    import {mixins} from "vue-class-component";
+    import {defineComponent, computed} from "vue";
+    import {useRoute} from "vue-router";
 
-    @Component({
-        components: {ErrorBox}
-    })
-    export default class QuestDetailPage extends mixins(QuestListInheritorMixin) {
-        private defaultQuest: Quest = {
-            id: "undefined",
-            visible: true,
-            name: "undefined",
-            sourceRegion: "undefined",
-            questType: QuestType.MAIN,
-            objectives: [],
-            description: "undefined"
-        };
+    export default defineComponent({
+        components: { ErrorBox },
+        setup() {
+            const defaultQuest: Quest = {
+                id: "undefined",
+                visible: true,
+                name: "undefined",
+                sourceRegion: "undefined",
+                questType: QuestType.MAIN,
+                objectives: [],
+                description: "undefined"
+            };
 
-        get selectedQuest() {
-            let questMatchingId = this.defaultQuest;
-            this.questList.forEach((quest) => {
-                if (quest.id === this.$route.params["questId"]) {
-                    questMatchingId = quest;
-                }
-            });
+            const { questList, backendError } = useQuestListInheritor();
+            const route = useRoute();
+            const selectedQuest = computed(() =>
+                questList.value.find(quest => quest.id === route.params["questId"]) ?? defaultQuest
+            );
 
-            return questMatchingId;
+            /**
+             * Splits the quest description by LF characters so the description actually appears in paragraphs as intended
+             */
+            const questDescriptionLines = computed(() => selectedQuest.value.description.split("\n"));
+
+            return { questList, backendError, selectedQuest, questDescriptionLines };
         }
-
-        /**
-         * Splits the quest description by LF characters so the description actually appears in paragraphs as intended
-         */
-        get questDescriptionLines() {
-            return this.selectedQuest.description.split("\n");
-        }
-    }
+    });
 </script>
 
 <style scoped lang="scss">
@@ -109,16 +104,17 @@
   }
 
   /* CSS transitions for above transition element */
-  .zoom-transition-enter, .zoom-transition-leave-to {
-    opacity: 0;
-    transform: scale(0.5);
+  .zoom-transition-enter-from, .zoom-transition-leave-to {
+      opacity: 0;
+      transform: scale(0.5);
   }
 
   .zoom-transition-enter-active, .zoom-transition-leave-active {
       transition: opacity $transitionDuration, transform $transitionDuration;
       overflow: hidden;
       position: fixed;
-      width: 80%;
+      box-sizing: border-box;
+      width: 100%;
 
       @include on-device-type(mobile) {
           width: calc(100% - 16px); // Body adds 8px margin

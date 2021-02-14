@@ -10,39 +10,47 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from "vue-property-decorator";
+import {computed, defineComponent, PropType} from "vue";
     import {Objective, Quest, QuestType} from "common-interfaces/QuestInterfaces";
 
-    @Component
-    export default class QuestChip extends Vue {
-        @Prop() quest!: Quest;
-
-        get formattedType() {
-            switch (this.quest.questType) {
-                case QuestType.MAIN:
-                    return "Main";
-                case QuestType.SIDE:
-                    return "Side";
-                default:
-                    return "Unknown Type";
+    export default defineComponent({
+        props: {
+            quest: {
+                type: Object as PropType<Quest>,
+                required: true,
             }
-        }
+        },
 
-        get completedObjectives() {
-            return this.quest.objectives.reduce((completedCount: number, objective: Objective) => {
-                if (objective.completed) return completedCount + 1;
-                else return completedCount;
-            }, 0);
-        }
+        setup(props) {
+            const formattedType = computed( () => {
+                switch (props.quest.questType) {
+                    case QuestType.MAIN:
+                        return "Main";
+                    case QuestType.SIDE:
+                        return "Side";
+                    default:
+                        return "Unknown Type";
+                }
+            })
 
-        get totalObjectives() {
-            return this.quest.objectives.length;
-        }
+            const completedObjectives = computed( () => {
+                return props.quest.objectives.reduce((completedCount: number, objective: Objective) => {
+                    if (objective.completed) return completedCount + 1;
+                    else return completedCount;
+                }, 0);
+            });
 
-        get horizontalContainerClasses() {
-            return {"accent-background": this.quest.questType === QuestType.MAIN, "vertical-flexbox": true, "rounded-container": true};
+            const totalObjectives = computed(() => {
+                return props.quest.objectives.length;
+            });
+
+            const horizontalContainerClasses = computed( () => {
+                return {"accent-background": props.quest.questType === QuestType.MAIN, "vertical-flexbox": true, "rounded-container": true};
+            });
+
+            return { formattedType, completedObjectives, totalObjectives, horizontalContainerClasses };
         }
-    }
+    });
 </script>
 
 <style scoped lang="scss">

@@ -9,9 +9,8 @@ import {
     QuestType,
     QuestUpdate
 } from "common-interfaces";
-import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "@/ts/QuestListPatcher";
-import UpdateTargetNotFoundError from "@/ts/UpdateTargetNotFoundError";
-import {expect} from 'chai';
+import {patchQuestListOnAdd, patchQuestListOnDelete, patchQuestListOnUpdate} from "../../../src/ts/QuestListPatcher";
+import UpdateTargetNotFoundError from "../../../src//ts/UpdateTargetNotFoundError";
 
 describe("Quest list patchers", () => {
     let questList: Quest[];
@@ -56,7 +55,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnAdd(addRequest, questList);
 
-        expect(questList).to.have.ordered.members([ questToAdd ]);
+        expect(questList).toEqual([ questToAdd ]);
     });
 
     it("can add new objectives to existing quests", () => {
@@ -71,7 +70,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnAdd(addRequest, questList);
 
-        expect(questList[1].objectives).to.have.ordered.members([objectiveTwo]);
+        expect(questList[1].objectives).toEqual([objectiveTwo]);
     });
 
     it("throws an exception when a quest cannot be found on objective add", () => {
@@ -81,7 +80,7 @@ describe("Quest list patchers", () => {
             newData: objectiveTwo
         };
 
-        expect(() => patchQuestListOnAdd(addRequest, questList)).to.throw(UpdateTargetNotFoundError);
+        expect(() => patchQuestListOnAdd(addRequest, questList)).toThrowError(UpdateTargetNotFoundError);
     });
 
     it("can update quests", () => {
@@ -105,7 +104,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnUpdate(updateRequest, questList);
 
-        expect(questToAdd).to.deep.equal(expectedQuest);
+        expect(questToAdd).toEqual(expectedQuest);
     });
 
     it("throws an exception when a quest could not be found on update", () => {
@@ -118,7 +117,7 @@ describe("Quest list patchers", () => {
             updateDetail: questUpdate
         };
 
-        expect(() => patchQuestListOnUpdate(updateRequest, questList)).to.throw(UpdateTargetNotFoundError);
+        expect(() => patchQuestListOnUpdate(updateRequest, questList)).toThrowError(UpdateTargetNotFoundError);
     });
 
     it("can update objectives", () => {
@@ -144,7 +143,7 @@ describe("Quest list patchers", () => {
 
         patchQuestListOnUpdate(updateRequest, questList);
 
-        expect(objectiveOne).to.deep.equal(expectedObjective);
+        expect(objectiveOne).toEqual(expectedObjective);
     });
 
     it("throws an exception when an objective could not be found on update", () => {
@@ -160,7 +159,7 @@ describe("Quest list patchers", () => {
 
         questList.push(questToAdd);
 
-        expect(() => patchQuestListOnUpdate(updateRequest, questList)).to.throw(UpdateTargetNotFoundError);
+        expect(() => patchQuestListOnUpdate(updateRequest, questList)).toThrowError(UpdateTargetNotFoundError);
     });
 
     it("can delete quests", () => {
@@ -172,7 +171,7 @@ describe("Quest list patchers", () => {
         questList.push(questToAdd, questToAdd2);
         patchQuestListOnDelete(deletionRequest, questList);
 
-        expect(questList).to.have.ordered.members([questToAdd2]);
+        expect(questList).toEqual([questToAdd2]);
     });
 
     it("throws an exception when a quest could not be found for deletion", () => {
@@ -181,7 +180,7 @@ describe("Quest list patchers", () => {
             id: "does-not-exist"
         };
 
-        expect(() => patchQuestListOnDelete(deletionRequest, questList)).to.throw(UpdateTargetNotFoundError);
+        expect(() => patchQuestListOnDelete(deletionRequest, questList)).toThrowError(UpdateTargetNotFoundError);
     });
 
     it("can delete objectives", () => {
@@ -199,7 +198,7 @@ describe("Quest list patchers", () => {
         questToAdd2.objectives.push(objectiveOne);
         patchQuestListOnDelete(deletionRequest, questList);
 
-        expect(questList).to.deep.equal(expectedQuestList);
+        expect(questList).toEqual(expectedQuestList);
     });
 
     it("throws an exception when an objective could not be found for deletion", () => {
@@ -210,6 +209,6 @@ describe("Quest list patchers", () => {
         };
 
         questList.push(questToAdd);
-        expect(() => patchQuestListOnDelete(deletionRequest, questList)).to.throw(UpdateTargetNotFoundError);
+        expect(() => patchQuestListOnDelete(deletionRequest, questList)).toThrowError(UpdateTargetNotFoundError);
     });
 });

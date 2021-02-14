@@ -13,6 +13,7 @@ import {
 import {ErrorDescription, NewlyCreatedDescription} from "common-interfaces/RestResponses";
 import {MessageType} from "common-interfaces/NotificationInterfaces";
 import {AccessTokenRequest, LoginToken, NonceSaltPair} from 'common-interfaces';
+import {produceApiPath, produceListenerPath} from "./PathGeneration";
 
 export class BadHTTPCodeError extends Error {
     statusCode : number;
@@ -55,14 +56,6 @@ enum HttpMethod {
     POST = "POST",
     PUT = "PUT",
     DELETE = "DELETE"
-}
-
-function produceApiPath(path: string) : string {
-    return `${process.env.VUE_APP_SCHEME}://${process.env.VUE_APP_BACKEND_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_API_ROOT_PATH}/${path}`;
-}
-
-function produceListenerPath(path: string) : string {
-    return `${process.env.VUE_APP_SCHEME}://${process.env.VUE_APP_BACKEND_UPDATE_HOSTNAME_AND_PORT}${process.env.VUE_APP_BACKEND_UPDATE_ROOT_PATH}/${path}`;
 }
 
 function applyAuthCredentials(credentials: ApiCredentials) : Record<string, string> {
@@ -191,7 +184,7 @@ export async function loginWithCredentials(username: string, password: string) :
 }
 
 export async function deauthCredentials(credentials: ApiCredentials) : Promise<void> {
-    return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE);
+    return backendTransaction(`auth/${credentials.username}/token/${credentials.authToken}`, HttpMethod.DELETE, undefined, undefined, false);
 }
 
 export async function createQuest(credentials: ApiCredentials, newQuest: RestBodyQuest) : Promise<void> {

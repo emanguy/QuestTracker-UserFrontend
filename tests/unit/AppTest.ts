@@ -1,58 +1,69 @@
-import sinon from "sinon";
-import chai, {expect} from 'chai';
-import promiseExtension from "chai-as-promised";
 import {BadHTTPCodeError, MalformedResponseError} from '../../src/ts/BackendConnector';
 import MainAppComponent from "../../src/App.vue";
 import {shallowMount} from "@vue/test-utils";
 import {timeout} from "./TestUtils";
-import Router from "vue-router";
-import Vue from "vue";
+import router from "../../src/router";
 
-chai.use(promiseExtension);
-Vue.use(Router);
+jest.mock("../../src/ts/PathGeneration.ts");
 
 describe("Primary app component", () => {
     const fakeBackendListener = {
-        createEventListeners: sinon.stub([]),
-        updateEventListeners: sinon.stub([]),
-        deleteEventListeners: sinon.stub([]),
-        errorEventListeners: sinon.stub([]),
-        startListening: sinon.stub(),
-        stopListening: sinon.stub()
+        createEventListeners: [],
+        updateEventListeners: [],
+        deleteEventListeners: [],
+        errorEventListeners: [],
+        startListening: jest.fn(),
+        stopListening: jest.fn(),
     };
 
+    beforeEach(() => {
+        fakeBackendListener.createEventListeners = [];
+        fakeBackendListener.updateEventListeners = [];
+        fakeBackendListener.deleteEventListeners = [];
+        fakeBackendListener.errorEventListeners = [];
+        fakeBackendListener.startListening.mockClear();
+        fakeBackendListener.stopListening.mockClear();
+    });
+
     it("retries backend request 5 times before giving up", async () => {
-        const getQuestListStub = sinon.stub().rejects(new BadHTTPCodeError("message", 400));
+        const getQuestListStub = jest.fn(async () => {
+            throw new BadHTTPCodeError("message", 400)
+        });
         const mount = shallowMount(MainAppComponent, {
-            data: function() { // Overwriting the method to retrieve quests
-                return {
-                    retrieveQuestsMethod: getQuestListStub,
-                    backendUpdateListener: fakeBackendListener
-                }
-            }
+            props: {
+                retrieveQuestsMethod: getQuestListStub,
+                backendUpdateListener: fakeBackendListener
+            },
+            global: {
+                plugins: [router],
+            },
         });
 
         await timeout(100);
-        console.log(`Times stub was invoked: ${getQuestListStub.callCount}`);
-        expect(getQuestListStub.callCount).to.equal(5);
-        expect(mount.vm.$data["backendError"]).to.be.an.instanceOf(BadHTTPCodeError);
+        console.log(`Times stub was invoked: ${getQuestListStub.mock.calls.length}`);
+        expect(getQuestListStub).toHaveBeenCalledTimes(5);
+        expect(mount.vm.backendError).toBeInstanceOf(BadHTTPCodeError);
     });
 
     it("resets error count to 0 on a success", async () => {
-        const failingGetQuestsStub = sinon.stub();
-        failingGetQuestsStub.onCall(0).rejects(new BadHTTPCodeError("message", 400));
-        failingGetQuestsStub.onCall(1).rejects(new MalformedResponseError());
-        failingGetQuestsStub.resolves([]);
+        const failingGetQuestsStub = jest.fn(async () => [])
+            .mockImplementationOnce(async () => {
+                throw new BadHTTPCodeError("message", 400);
+            })
+            .mockImplementationOnce(async () => {
+                throw new MalformedResponseError();
+            });
         const mount = shallowMount(MainAppComponent, {
-            data: function () { // Overwriting the method to retrieve quests
-                return {
-                    retrieveQuestsMethod: failingGetQuestsStub,
-                    backendUpdateListener: fakeBackendListener
-                }
-            }
+            props: {
+                retrieveQuestsMethod: failingGetQuestsStub,
+                backendUpdateListener: fakeBackendListener
+            },
+            global: {
+                plugins: [router],
+            },
         });
 
         await timeout(100);
-        expect(mount.vm.$data["badResponseRetries"]).to.equal(0);
+        expect(mount.vm.badResponseRetries).toBe(0);
     });
 });

@@ -5,35 +5,49 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from "vue-property-decorator";
+import {computed, defineComponent, PropType} from "vue";
     import {BackendOfflineError, BadHTTPCodeError, MalformedResponseError} from "../ts/BackendConnector";
 
-    @Component
-    export default class ErrorBox extends Vue{
-        @Prop({default: null}) backendError!: Error|null;
-        @Prop({default: true}) hideOnNoError!: Boolean;
-        @Prop({default: () => {}}) specialHttpStatusMessages!: {[code: number]: string};
+    export default defineComponent({
+        props: {
+            backendError: {
+                type: Error,
+                default: null,
+            },
+            hideOnNoError: {
+                type: Boolean,
+                default: true,
+            },
+            specialHttpStatusMessages: {
+                type: Object as PropType<{[code: number]: string}>,
+                default: () => {},
+            },
+        },
 
-        get renderError() : String {
-            if (this.backendError instanceof BadHTTPCodeError) {
-                if (this.specialHttpStatusMessages[this.backendError.statusCode]) {
-                    return this.specialHttpStatusMessages[this.backendError.statusCode];
+        setup(props) {
+            const renderError = computed(() => {
+                if (props.backendError instanceof BadHTTPCodeError) {
+                    if (props.specialHttpStatusMessages[props.backendError.statusCode]) {
+                        return props.specialHttpStatusMessages[props.backendError.statusCode];
+                    }
+                    else {
+                        return `Backend server sent bad HTTP code: ${props.backendError.statusCode}. Please reload the page.`;
+                    }
+                }
+                else if (props.backendError instanceof MalformedResponseError) {
+                    return "Couldn't make heads or tails of the response from the server. Please reload the page.";
+                }
+                else if (props.backendError instanceof BackendOfflineError) {
+                    return "Could not get the list of quests, the backend server could not be reached.";
                 }
                 else {
-                    return `Backend server sent bad HTTP code: ${this.backendError.statusCode}. Please reload the page.`;
+                    return "Unknown error occurred.";
                 }
-            }
-            else if (this.backendError instanceof MalformedResponseError) {
-                return "Couldn't make heads or tails of the response from the server. Please reload the page.";
-            }
-            else if (this.backendError instanceof BackendOfflineError) {
-                return "Could not get the list of quests, the backend server could not be reached.";
-            }
-            else {
-                return "Unknown error occurred.";
-            }
+            });
+
+            return { renderError };
         }
-    }
+    });
 </script>
 
 <style scoped lang="scss">

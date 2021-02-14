@@ -27,7 +27,7 @@ workflows:
             tags:
               ignore: /.*/
           pkg-manager: yarn
-          version: 8.17.0
+          version: 12.9.1
   deploy-on-tag:
     jobs:
       - gcp-gcr/build-and-push-image:

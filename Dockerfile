@@ -1,5 +1,5 @@
 ### Build Container ###
-FROM node:8 AS build-container
+FROM node:12 AS build-container
 RUN mkdir /yarn-build/
 WORKDIR /yarn-build/
 ENV NODE_ENV development
@@ -7,7 +7,7 @@ COPY ./src/ ./src/
 COPY ./public/ ./public/
 COPY ./tests/ ./tests/
 COPY ./types/ ./types/
-COPY [ ".browserslistrc", ".env", "babel.config.js", "package.json", "postcss.config.js", "tsconfig.json", "vue.config.js", "yarn.lock", "./"]
+COPY [ ".browserslistrc", ".env", "package.json", "tsconfig.json", "yarn.lock", "vite.config.ts", "index.html", "./"]
 RUN yarn install && \
     yarn build
 

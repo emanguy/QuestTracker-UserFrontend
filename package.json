@@ -3,40 +3,48 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "test": "yarn test:unit",
-    "test:unit": "vue-cli-service test:unit 'tests/**/*.ts'"
+    "serve": "vite",
+    "build": "vite build",
+    "test": "jest"
   },
   "dependencies": {
-    "@types/bcryptjs": "^2.4.2",
-    "@types/uuid": "^3.4.4",
     "bcryptjs": "^2.4.3",
     "common-interfaces": "github:emanguy/QuestTracker-CommonInterfaces#1.2.1",
     "nonce": "^1.0.4",
     "uuid": "^3.3.2",
-    "vue": "^2.5.17",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.1"
+    "vue": "3",
+    "vue-router": "4"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.0",
-    "@types/chai-as-promised": "^7.1.0",
-    "@types/mocha": "^5.2.4",
-    "@types/sinon": "^5.0.5",
-    "@vue/cli-plugin-babel": "^3.0.4",
-    "@vue/cli-plugin-typescript": "^3.0.4",
-    "@vue/cli-plugin-unit-mocha": "^3.0.4",
-    "@vue/cli-service": "^3.0.4",
-    "@vue/test-utils": "^1.0.0-beta.20",
-    "chai": "^4.1.2",
-    "chai-as-promised": "^7.1.1",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^7.0.1",
-    "sinon": "^7.1.1",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jest": "26",
+    "@types/uuid": "^3.4.4",
+    "@vitejs/plugin-vue": "1.1",
+    "@vue/compiler-sfc": "^3.0.5",
+    "@vue/test-utils": "^2.0.0-rc.0",
+    "@vuedx/typecheck": "^0.6.3",
+    "@vuedx/typescript-plugin-vue": "^0.6.3",
+    "jest": "26",
+    "sass": "^1.32.6",
+    "ts-jest": "26",
     "ts-node": "^7.0.1",
-    "typescript": "^3.0.0",
-    "vue-template-compiler": "^2.5.17"
+    "typescript": "4.1",
+    "vite": "^2.0.0-beta.64",
+    "vue-jest": "^5.0.0-alpha.7"
+  },
+  "jest": {
+    "verbose": true,
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      ".*\\.(vue)$": "vue-jest",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testURL": "http://localhost",
+    "testRegex": "tests/.*Test\\.(jsx?|tsx?)$"
   }
 }

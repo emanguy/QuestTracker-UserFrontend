@@ -3,8 +3,6 @@
         <error-box class="margin-under" :backendError="currentError" :specialHttpStatusMessages="loginErrorMessages"></error-box>
         <component
                 :is="contentType"
-                :auth-token="credentials"
-                :quest-list="questList"
                 @login-success="onLoginSuccess"
                 @login-failure="onAccessFailure"
                 @backend-error="onAccessFailure"
@@ -14,62 +12,73 @@
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
-    import QuestListInheritorMixin from "../ts/QuestListInheritorMixin";
     import AdminLoginDialog from "../components/AdminLoginDialog.vue";
     import AdminQuestList from "../components/AdminQuestEditor.vue";
     import ErrorBox from "../components/ErrorBox.vue";
     import {ApiCredentials, deauthCredentials} from "../ts/BackendConnector";
-    import {mixins} from "vue-class-component";
+    import {defineComponent, provide, reactive, ref} from "vue";
+    import {AUTH_TOKEN_KEY} from "../composition/AuthTokenInheritor";
 
-    @Component({
-        components: {ErrorBox, AdminLoginDialog, AdminQuestList}
-    })
-    export default class AdminPage extends mixins(QuestListInheritorMixin) {
-        contentType: string = "AdminLoginDialog";
-        currentError: Error|null = null;
-        credentials: ApiCredentials|null = null;
-        loginErrorMessages = {
-            400: "You sent a malformed username or password.",
-            403: "Incorrect username/password combination or expired session.",
-            404: "That user does not exist.",
-            500: "Something on the back-end blew up."
-        };
+    export default defineComponent({
+        components: { ErrorBox, AdminLoginDialog, AdminQuestList },
+        setup() {
+            const contentType = ref("AdminLoginDialog");
+            const credentials = ref<ApiCredentials|null>(null);
+            provide(AUTH_TOKEN_KEY, credentials);
 
-        onLoginSuccess(token: ApiCredentials) {
-            console.log("Login successful");
-            console.log(token);
-            this.currentError = null;
-            this.credentials = token;
-            this.contentType = "AdminQuestList";
-        }
+            const currentError = ref<Error|null>(null);
+            const loginErrorMessages = reactive({
+                400: "You sent a malformed username or password.",
+                403: "Incorrect username/password combination or expired session.",
+                404: "That user does not exist.",
+                500: "Something on the back-end blew up."
+            });
 
-        onAccessFailure(error: Error) {
-            console.log("Backend access failure");
-            console.log(error);
-            this.currentError = error;
-            this.credentials = null;
-            this.contentType = "AdminLoginDialog";
-        }
-
-        async onLogout() {
-            console.log("Logging user out.");
-
-            if (this.credentials != null) {
-                try {
-                    await deauthCredentials(this.credentials);
-                }
-                catch (err) {
-                    console.error("Deauth failed.");
-                    console.error(err);
-                }
+            function onLoginSuccess(token: ApiCredentials) {
+                console.log("Login successful");
+                console.log(token);
+                currentError.value = null;
+                credentials.value = token;
+                contentType.value = "AdminQuestList";
+            }
+            function onAccessFailure(error: Error) {
+                console.log("Backend access failure");
+                console.log(error);
+                currentError.value = error;
+                credentials.value = null;
+                contentType.value = "AdminLoginDialog";
             }
 
-            this.contentType = "AdminLoginDialog";
-            this.credentials = null;
-            alert("Successfully logged out.");
+            async function onLogout() {
+                console.log("Logging user out.");
+
+                if (credentials.value != null) {
+                    try {
+                        await deauthCredentials(credentials.value);
+                    }
+                    catch (err) {
+                        console.error("Deauth failed.");
+                        console.error(err);
+                    }
+                }
+
+                contentType.value = "AdminLoginDialog";
+                credentials.value = null;
+                alert("Successfully logged out.");
+            }
+
+            return {
+                contentType,
+                credentials,
+                currentError,
+                loginErrorMessages,
+
+                onLoginSuccess,
+                onAccessFailure,
+                onLogout,
+            };
         }
-    }
+    });
 </script>
 
 <style scoped lang="scss">
