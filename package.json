@@ -29,7 +29,7 @@
     "ts-jest": "26",
     "ts-node": "^7.0.1",
     "typescript": "4.1",
-    "vite": "^2.0.0-beta.64",
+    "vite": "^2.9.13",
     "vue-jest": "^5.0.0-alpha.7"
   },
   "jest": {
